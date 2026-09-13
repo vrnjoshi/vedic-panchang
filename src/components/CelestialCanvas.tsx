@@ -11,15 +11,17 @@ import moonTextureImg from '../assets/textures/moon.jpg';
 
 interface CelestialCanvasProps {
   panchang: PanchangData;
+  offsetDays?: number;
 }
 
-export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) => {
+export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offsetDays = 0 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
   const rendererRef = useRef<THREE.WebGLRenderer | null>(null);
 
   // Celestial Objects
+  const earthTiltGroupRef = useRef<THREE.Group | null>(null);
   const earthMeshRef = useRef<THREE.Mesh | null>(null);
   const earthCloudsRef = useRef<THREE.Mesh | null>(null);
   const sunGroupRef = useRef<THREE.Group | null>(null);
@@ -31,6 +33,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
   const sunlightRef = useRef<THREE.DirectionalLight | null>(null);
   const moonMeshRef = useRef<THREE.Mesh | null>(null);
   const tithiSectorRef = useRef<THREE.Mesh | null>(null);
+  const nakshatraSpritesRef = useRef<THREE.Sprite[]>([]);
 
   // Interaction state
   const isDraggingRef = useRef(false);
@@ -62,7 +65,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     return new THREE.CanvasTexture(canvas);
   };
 
-  // Vedic Nakshatra Badge
+  // Vedic Nakshatra Badge with high-DPI rendering and iOS Emoji compatibility
   const createNakshatraBadgeTexture = (
     index: number,
     emoji: string,
@@ -70,45 +73,92 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     englishName: string
   ) => {
     const canvas = document.createElement('canvas');
-    canvas.width = 256;
-    canvas.height = 256;
+    canvas.width = 512;
+    canvas.height = 512;
     const ctx = canvas.getContext('2d')!;
-    ctx.clearRect(0, 0, 256, 256);
+    ctx.clearRect(0, 0, 512, 512);
 
-    const bgGrad = ctx.createRadialGradient(128, 128, 30, 128, 128, 120);
-    bgGrad.addColorStop(0, 'rgba(30, 27, 75, 0.95)');
-    bgGrad.addColorStop(0.75, 'rgba(15, 23, 42, 0.90)');
-    bgGrad.addColorStop(1, 'rgba(217, 119, 6, 0.8)');
+    // Deep cosmic gradient background with rich opacity (guarantees solid backdrop)
+    const bgGrad = ctx.createRadialGradient(256, 256, 40, 256, 256, 240);
+    bgGrad.addColorStop(0, 'rgba(26, 22, 68, 0.98)');
+    bgGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.96)');
+    bgGrad.addColorStop(1, 'rgba(217, 119, 6, 0.92)');
 
     ctx.fillStyle = bgGrad;
     ctx.beginPath();
-    ctx.arc(128, 128, 120, 0, Math.PI * 2);
+    ctx.arc(256, 256, 240, 0, Math.PI * 2);
     ctx.fill();
 
+    // Outer golden boundary ring
     ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 4;
+    ctx.lineWidth = 8;
     ctx.beginPath();
-    ctx.arc(128, 128, 116, 0, Math.PI * 2);
+    ctx.arc(256, 256, 232, 0, Math.PI * 2);
     ctx.stroke();
 
-    ctx.font = '76px sans-serif';
+    // Inner subtle cosmic glow ring
+    ctx.strokeStyle = 'rgba(254, 240, 138, 0.45)';
+    ctx.lineWidth = 3;
+    ctx.beginPath();
+    ctx.arc(256, 256, 220, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Dedicated illuminated backdrop disc specifically behind the Nakshatra symbol
+    // Ensures symbols are vibrantly visible and never blend with dark canvas backgrounds
+    const iconDiscGrad = ctx.createRadialGradient(256, 175, 10, 256, 175, 115);
+    iconDiscGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
+    iconDiscGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.25)');
+    iconDiscGrad.addColorStop(0.85, 'rgba(129, 140, 248, 0.15)');
+    iconDiscGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = iconDiscGrad;
+    ctx.beginPath();
+    ctx.arc(256, 175, 115, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Ensure Unicode Emoji Presentation Selector (\uFE0F) is present
+    // This tells iOS Safari / WebKit and Android to render standard colorful graphical emoji instead of monochrome text glyphs
+    const formattedEmoji = emoji.includes('\uFE0F') ? emoji : `${emoji}\uFE0F`;
+
+    // CRITICAL iOS / iPhone Safari Fix:
+    // Explicitly set fillStyle to opaque white before drawing text glyphs
+    // Provide system emoji fonts first in font stack
+    ctx.save();
+    ctx.font = '145px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(emoji, 128, 92);
+    ctx.fillStyle = '#ffffff';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
+    ctx.shadowBlur = 12;
+    ctx.fillText(formattedEmoji, 256, 175);
+    ctx.restore();
 
-    ctx.font = 'bold 28px sans-serif';
+    // Sacred Devanagari Hindi Name
+    ctx.save();
+    ctx.font = 'bold 54px sans-serif';
     ctx.fillStyle = '#fef08a';
-    ctx.shadowColor = 'rgba(0,0,0,0.85)';
-    ctx.shadowBlur = 5;
-    ctx.fillText(hindiName, 128, 158);
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+    ctx.shadowBlur = 8;
+    ctx.fillText(hindiName, 256, 320);
+    ctx.restore();
 
-    ctx.font = '600 20px sans-serif';
-    ctx.fillStyle = '#cbd5e1';
-    ctx.shadowBlur = 3;
-    ctx.fillText(`${index + 1}. ${englishName}`, 128, 194);
+    // English Name & Lunar Mansion Number
+    ctx.save();
+    ctx.font = '600 38px sans-serif';
+    ctx.fillStyle = '#e2e8f0';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
+    ctx.shadowBlur = 6;
+    ctx.fillText(`${index + 1}. ${englishName}`, 256, 388);
+    ctx.restore();
 
     const texture = new THREE.CanvasTexture(canvas);
     texture.minFilter = THREE.LinearFilter;
+    texture.magFilter = THREE.LinearFilter;
+    texture.generateMipmaps = true;
+    texture.needsUpdate = true;
     return texture;
   };
 
@@ -128,6 +178,8 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     group.add(new THREE.Line(circleGeo, circleMat));
 
     const nakshatraDegrees = 360 / 27;
+    nakshatraSpritesRef.current = [];
+
     for (let i = 0; i < 27; i++) {
       const angleDeg = i * nakshatraDegrees;
       const rad = (angleDeg * Math.PI) / 180;
@@ -160,13 +212,14 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
         const spriteMat = new THREE.SpriteMaterial({
           map: badgeTexture,
           transparent: true,
-          opacity: 0.95,
+          opacity: 1.0,
           depthWrite: false,
         });
         const sprite = new THREE.Sprite(spriteMat);
         sprite.position.set(Math.cos(midRad) * badgeR, 0.3, -Math.sin(midRad) * badgeR);
-        sprite.scale.set(2.1, 2.1, 1);
+        sprite.scale.set(2.2, 2.2, 1);
         group.add(sprite);
+        nakshatraSpritesRef.current.push(sprite);
       }
     }
 
@@ -257,6 +310,11 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     // ==========================================
     // 1. AUTHENTIC NASA EARTH (Blue Marble)
     // ==========================================
+    const earthTiltGroup = new THREE.Group();
+    earthTiltGroup.rotation.z = (23.44 * Math.PI) / 180; // Authentic axial tilt (23.44°)
+    scene.add(earthTiltGroup);
+    earthTiltGroupRef.current = earthTiltGroup;
+
     const earthGeo = new THREE.SphereGeometry(1.6, 64, 64);
     const earthMat = new THREE.MeshStandardMaterial({
       map: earthTexture,
@@ -264,8 +322,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
       metalness: 0.05,
     });
     const earthMesh = new THREE.Mesh(earthGeo, earthMat);
-    earthMesh.rotation.z = (23.44 * Math.PI) / 180; // Authentic axial tilt
-    scene.add(earthMesh);
+    earthTiltGroup.add(earthMesh);
     earthMeshRef.current = earthMesh;
 
     // Authentic Cloud Layer
@@ -516,10 +573,10 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
       scene.rotation.y += (targetSceneRotationRef.current.y - scene.rotation.y) * 0.1;
       scene.rotation.x += (targetSceneRotationRef.current.x - scene.rotation.x) * 0.1;
 
-      // Natural celestial rotations
-      if (earthMeshRef.current) earthMeshRef.current.rotation.y += 0.002;
-      if (earthCloudsRef.current) earthCloudsRef.current.rotation.y += 0.0028;
-      if (moonMeshRef.current) moonMeshRef.current.rotation.y += 0.001;
+      // Subtle natural celestial rotations
+      if (earthMeshRef.current) earthMeshRef.current.rotation.y += 0.0008;
+      if (earthCloudsRef.current) earthCloudsRef.current.rotation.y += 0.0012;
+      // (Note: Moon axial rotation is tidally locked to Earth and updated with orbit)
 
       // ==========================================
       // DYNAMIC FIERY SOLAR ANIMATION (Like SDO)
@@ -593,7 +650,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     };
   }, []);
 
-  // Update Sun & Moon 3D coordinates & Tithi Sector
+  // Update Sun & Moon 3D coordinates, Tidal Locking, Earth Rotation & Tithi Sector
   useEffect(() => {
     if (!sunGroupRef.current || !moonMeshRef.current || !tithiSectorRef.current) return;
 
@@ -607,16 +664,49 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     const sunX = Math.cos(sunRad) * orbitRadiusSun;
     const sunZ = -Math.sin(sunRad) * orbitRadiusSun;
 
+    // Sun Revolution Position along the Ecliptic
     sunGroupRef.current.position.set(sunX, 0, sunZ);
     if (sunlightRef.current) {
       sunlightRef.current.position.set(sunX, 0, sunZ);
+      sunlightRef.current.target.position.set(0, 0, 0);
+      sunlightRef.current.target.updateMatrixWorld();
     }
 
-    moonMeshRef.current.position.set(
-      Math.cos(moonRad) * orbitRadiusMoon,
-      0,
-      -Math.sin(moonRad) * orbitRadiusMoon
-    );
+    // Moon Revolution Position along its Lunar Orbit
+    const moonX = Math.cos(moonRad) * orbitRadiusMoon;
+    const moonZ = -Math.sin(moonRad) * orbitRadiusMoon;
+    moonMeshRef.current.position.set(moonX, 0, moonZ);
+
+    // AUTHENTIC TIDAL LOCKING PHYSICS:
+    // The Moon's orbital period matches its axial rotation period exactly (1:1 resonance).
+    // The same lunar hemisphere (Near Side) continuously faces the Earth center (0, 0, 0).
+    // As the Moon revolves around Earth, lookAt(0, 0, 0) dynamically turns the Moon on its polar axis!
+    moonMeshRef.current.lookAt(0, 0, 0);
+
+    // AUTHENTIC EARTH DIURNAL AXIAL ROTATION:
+    // Earth completes exactly 1 full rotation (360° / 2π rad) per 24-hour solar day.
+    if (earthMeshRef.current) {
+      const earthAngle = ((offsetDays || 0) * Math.PI * 2) % (Math.PI * 2);
+      earthMeshRef.current.rotation.y = earthAngle;
+    }
+    if (earthCloudsRef.current) {
+      const cloudAngle = (((offsetDays || 0) * Math.PI * 2 * 1.05) % (Math.PI * 2));
+      earthCloudsRef.current.rotation.y = cloudAngle;
+    }
+
+    // Active Nakshatra Highlighting:
+    // Enlarge the sprite representing the currently occupied Nakshatra
+    if (nakshatraSpritesRef.current.length === 27) {
+      nakshatraSpritesRef.current.forEach((sprite, idx) => {
+        if (idx === panchang.nakshatra.index) {
+          sprite.scale.set(3.0, 3.0, 1);
+          sprite.material.opacity = 1.0;
+        } else {
+          sprite.scale.set(2.2, 2.2, 1);
+          sprite.material.opacity = 0.88;
+        }
+      });
+    }
 
     const segments = 64;
     const relAngleRad = (relAngle * Math.PI) / 180;
@@ -642,7 +732,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang }) =>
     newGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     newGeo.computeVertexNormals();
     tithiSectorRef.current.geometry = newGeo;
-  }, [panchang]);
+  }, [panchang, offsetDays]);
 
   return (
     <div
