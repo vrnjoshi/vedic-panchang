@@ -89,69 +89,84 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.arc(256, 256, 240, 0, Math.PI * 2);
     ctx.fill();
 
-    // Outer golden boundary ring
-    ctx.strokeStyle = '#f59e0b';
-    ctx.lineWidth = 8;
+    // Outer golden boundary ring with rich contrast
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 10;
     ctx.beginPath();
-    ctx.arc(256, 256, 232, 0, Math.PI * 2);
+    ctx.arc(256, 256, 234, 0, Math.PI * 2);
     ctx.stroke();
 
     // Inner subtle cosmic glow ring
-    ctx.strokeStyle = 'rgba(254, 240, 138, 0.45)';
+    ctx.strokeStyle = 'rgba(254, 240, 138, 0.6)';
     ctx.lineWidth = 3;
     ctx.beginPath();
-    ctx.arc(256, 256, 220, 0, Math.PI * 2);
+    ctx.arc(256, 256, 222, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Dedicated illuminated backdrop disc specifically behind the Nakshatra symbol
+    // Dedicated illuminated circular backdrop disc specifically behind the Nakshatra symbol
     // Ensures symbols are vibrantly visible and never blend with dark canvas backgrounds
-    const iconDiscGrad = ctx.createRadialGradient(256, 175, 10, 256, 175, 115);
-    iconDiscGrad.addColorStop(0, 'rgba(255, 255, 255, 0.35)');
-    iconDiscGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.25)');
-    iconDiscGrad.addColorStop(0.85, 'rgba(129, 140, 248, 0.15)');
+    const iconDiscGrad = ctx.createRadialGradient(256, 172, 10, 256, 172, 115);
+    iconDiscGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
+    iconDiscGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.3)');
+    iconDiscGrad.addColorStop(0.85, 'rgba(129, 140, 248, 0.2)');
     iconDiscGrad.addColorStop(1, 'rgba(0, 0, 0, 0)');
     ctx.fillStyle = iconDiscGrad;
     ctx.beginPath();
-    ctx.arc(256, 175, 115, 0, Math.PI * 2);
+    ctx.arc(256, 172, 115, 0, Math.PI * 2);
     ctx.fill();
 
     // Ensure Unicode Emoji Presentation Selector (\uFE0F) is present
     // This tells iOS Safari / WebKit and Android to render standard colorful graphical emoji instead of monochrome text glyphs
     const formattedEmoji = emoji.includes('\uFE0F') ? emoji : `${emoji}\uFE0F`;
 
-    // CRITICAL iOS / iPhone Safari Fix:
-    // Explicitly set fillStyle to opaque white before drawing text glyphs
-    // Provide system emoji fonts first in font stack
+    // CRITICAL iOS / iPhone Safari Centering & Contrast Fix:
+    // 1. Explicitly set textBaseline to 'alphabetic' and compute vertical ascent/descent for mathematical vertical centering.
+    // 2. High contrast emoji rendering with crisp backdrop.
     ctx.save();
-    ctx.font = '145px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
+    ctx.font = '135px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textBaseline = 'alphabetic';
     ctx.fillStyle = '#ffffff';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.9)';
-    ctx.shadowBlur = 12;
-    ctx.fillText(formattedEmoji, 256, 175);
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+    ctx.shadowBlur = 14;
+
+    // Measure metrics for exact vertical centering across iOS Safari and Chromium
+    const emojiMetrics = ctx.measureText(formattedEmoji);
+    const emojiAscent = emojiMetrics.actualBoundingBoxAscent || 95;
+    const emojiDescent = emojiMetrics.actualBoundingBoxDescent || 25;
+    const emojiCenterY = 172 + (emojiAscent - emojiDescent) / 2;
+    ctx.fillText(formattedEmoji, 256, emojiCenterY);
     ctx.restore();
 
-    // Sacred Devanagari Hindi Name
+    // Sacred Devanagari Hindi Name (Clean, crisp, high-contrast gold)
     ctx.save();
-    ctx.font = 'bold 54px sans-serif';
+    ctx.font = 'bold 54px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.fillStyle = '#fef08a';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
+    ctx.textBaseline = 'alphabetic';
     ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
-    ctx.shadowBlur = 8;
-    ctx.fillText(hindiName, 256, 320);
+    ctx.shadowBlur = 10;
+    const hindiMetrics = ctx.measureText(hindiName);
+    const hindiAscent = hindiMetrics.actualBoundingBoxAscent || 38;
+    const hindiDescent = hindiMetrics.actualBoundingBoxDescent || 10;
+    const hindiCenterY = 320 + (hindiAscent - hindiDescent) / 2;
+    ctx.fillText(hindiName, 256, hindiCenterY);
     ctx.restore();
 
-    // English Name & Lunar Mansion Number
+    // English Name & Lunar Mansion Number (High-contrast bright white with clean shadow)
     ctx.save();
-    ctx.font = '600 38px sans-serif';
-    ctx.fillStyle = '#e2e8f0';
+    ctx.font = '700 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillStyle = '#ffffff';
     ctx.textAlign = 'center';
-    ctx.textBaseline = 'middle';
-    ctx.shadowColor = 'rgba(0, 0, 0, 0.85)';
-    ctx.shadowBlur = 6;
-    ctx.fillText(`${index + 1}. ${englishName}`, 256, 388);
+    ctx.textBaseline = 'alphabetic';
+    ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
+    ctx.shadowBlur = 8;
+    const englishLabel = `${index + 1}. ${englishName}`;
+    const engMetrics = ctx.measureText(englishLabel);
+    const engAscent = engMetrics.actualBoundingBoxAscent || 26;
+    const engDescent = engMetrics.actualBoundingBoxDescent || 8;
+    const engCenterY = 392 + (engAscent - engDescent) / 2;
+    ctx.fillText(englishLabel, 256, engCenterY);
     ctx.restore();
 
     const texture = new THREE.CanvasTexture(canvas);
@@ -260,10 +275,15 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const scene = new THREE.Scene();
     sceneRef.current = scene;
 
+    const isMobile = width < 640 || width < height;
+    const initialDistance = isMobile ? 38 : 26;
+    const initialCamY = isMobile ? 22 : 16;
+
     const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-    camera.position.set(0, 16, 26);
+    camera.position.set(0, initialCamY, initialDistance);
     camera.lookAt(0, 0, 0);
     cameraRef.current = camera;
+    targetCameraPosRef.current.set(0, initialCamY, initialDistance);
 
     const renderer = new THREE.WebGLRenderer({
       antialias: true,
@@ -524,19 +544,45 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const handleMouseMove = (e: MouseEvent) => onPointerMove(e.clientX, e.clientY);
     const handleMouseUp = () => onPointerUp();
 
+    let pinchStartDistance: number | null = null;
+    let initialPinchCameraDist: number = 26;
+
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
+        pinchStartDistance = null;
         onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+      } else if (e.touches.length === 2) {
+        // Pinch-to-zoom start
+        isDraggingRef.current = false;
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        pinchStartDistance = Math.hypot(dx, dy);
+        initialPinchCameraDist = targetCameraPosRef.current.length();
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
+      if (e.touches.length === 1 && !pinchStartDistance) {
         onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
+      } else if (e.touches.length === 2 && pinchStartDistance) {
+        const dx = e.touches[0].clientX - e.touches[1].clientX;
+        const dy = e.touches[0].clientY - e.touches[1].clientY;
+        const currentDistance = Math.hypot(dx, dy);
+        const scaleFactor = pinchStartDistance / currentDistance;
+        const newDist = Math.max(10, Math.min(55, initialPinchCameraDist * scaleFactor));
+        targetCameraPosRef.current.normalize().multiplyScalar(newDist);
       }
     };
 
-    const handleTouchEnd = () => onPointerUp();
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (e.touches.length === 0) {
+        pinchStartDistance = null;
+        onPointerUp();
+      } else if (e.touches.length === 1) {
+        pinchStartDistance = null;
+        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
+      }
+    };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
