@@ -31,8 +31,21 @@
                 <p class="text-xs text-slate-400 mt-1">उत्तर भारतीय प्रणाली (पूर्णिमांत)</p>
             </div>
 
+            <!-- FESTIVAL BANNER (Hidden by default) -->
+            <div id="festival-banner" class="hidden rounded-xl p-4 mt-1 bg-gradient-to-r text-white shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-white/20 relative overflow-hidden transition-all duration-500">
+                <div class="relative z-10 flex items-center gap-4">
+                    <span id="festival-icon" class="text-4xl drop-shadow-md"></span>
+                    <div>
+                        <div class="text-[10px] font-bold text-white/80 uppercase tracking-widest mb-1">शुभ पर्व</div>
+                        <div id="festival-name" class="text-xl font-extrabold text-white drop-shadow-md tracking-wide"></div>
+                    </div>
+                </div>
+                <!-- Decorative shine effect -->
+                <div class="absolute -right-4 -top-4 w-24 h-24 bg-white opacity-10 rounded-full blur-2xl"></div>
+            </div>
+
             <!-- Current Date Display -->
-            <div class="text-sm bg-black/20 p-3 rounded-lg border border-white/5">
+            <div class="text-sm bg-black/20 p-3 rounded-lg border border-white/5 mt-1">
                 <p id="ui-gregorian-date" class="text-slate-300 font-medium"></p>
                 <p id="ui-location" class="text-xs text-slate-500 mt-1 flex items-center gap-1">
                     <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -99,7 +112,7 @@
                     <div class="flex justify-between"><span>Moon Longitude:</span> <span id="ui-moon-long">--</span></div>
                     <div class="flex justify-between"><span>Sun Longitude:</span> <span id="ui-sun-long">--</span></div>
                     <div class="h-px w-full bg-white/10 my-1"></div>
-                    <div class="flex justify-between text-blue-300 font-bold"><span>Relative Angle (Difference):</span> <span id="ui-rel-angle">--</span></div>
+                    <div class="flex justify-between text-blue-300 font-bold"><span>Relative Angle (Diff):</span> <span id="ui-rel-angle">--</span></div>
                 </div>
                 
                 <p class="text-xs text-slate-400 mb-3 leading-relaxed">
@@ -111,7 +124,7 @@
                 </div>
 
                 <p class="text-xs text-slate-400 mb-3 leading-relaxed">
-                    <strong class="text-slate-200">Nakshatra</strong> divides the 360° ecliptic into 27 sectors of 13°20' (13.33°), adjusted for Earth's precession (Ayanamsa) against fixed stars.
+                    <strong class="text-slate-200">Nakshatra</strong> divides the 360° ecliptic into 27 sectors of 13°20' (13.33°), adjusted for Earth's precession (Ayanamsa).
                 </p>
                 <div class="bg-purple-900/20 border border-purple-500/20 rounded-lg p-3 flex justify-between text-xs font-mono text-purple-200">
                     <span>Lahiri Ayanamsa:</span>
@@ -158,7 +171,7 @@
             "मार्गशीर्ष", "पौष", "माघ", "फाल्गुन"
         ];
 
-        // --- STREAMING_CHUNK:ASTRONOMICAL MATHEMATICS (Meeus Algorithms) ---
+        // --- ASTRONOMICAL MATHEMATICS (Meeus Algorithms) ---
         function normalizeAngle(angle) {
             angle = angle % 360;
             if (angle < 0) angle += 360;
@@ -166,7 +179,6 @@
         }
 
         function calculatePanchang(date) {
-            // Julian Date Calculation
             let year = date.getUTCFullYear();
             let month = date.getUTCMonth() + 1;
             let day = date.getUTCDate() + (date.getUTCHours() / 24) + (date.getUTCMinutes() / 1440);
@@ -180,10 +192,8 @@
             const B = 2 - A + Math.floor(A / 4);
             const JD = Math.floor(365.25 * (year + 4716)) + Math.floor(30.6001 * (month + 1)) + day + B - 1524.5;
             
-            // Centuries since J2000.0
             const T = (JD - 2451545.0) / 36525; 
 
-            // Sun Calculations
             let L0 = normalizeAngle(280.46646 + 36000.76983 * T + 0.0003032 * T * T);
             let M_sun = normalizeAngle(357.52911 + 35999.05029 * T - 0.0001537 * T * T);
             const M_sun_rad = M_sun * Math.PI / 180;
@@ -194,7 +204,6 @@
 
             const tropicalSun = normalizeAngle(L0 + C_sun);
 
-            // Moon Calculations (Simplified Perturbations for JS performance)
             let Lp = normalizeAngle(218.3164477 + 481267.88123421 * T);
             let D = normalizeAngle(297.8501921 + 445267.1114034 * T);
             const D_rad = D * Math.PI / 180;
@@ -210,14 +219,11 @@
                              - 0.186 * Math.sin(M_sun_rad)
                              - 0.114 * Math.sin(2 * F_rad));
 
-            // Lahiri Ayanamsa approximation
             const ayanamsa = 23.85 + (1.396 / 100) * ((year - 2000) + (month / 12));
             
-            // Sidereal (Nirayana) Longitudes
             const siderealSun = normalizeAngle(tropicalSun - ayanamsa);
             const siderealMoon = normalizeAngle(tropicalMoon - ayanamsa);
 
-            // --- STREAMING_CHUNK:PANCHANG DERIVATIONS ---
             const relativeAngle = normalizeAngle(tropicalMoon - tropicalSun);
             const tithiIndexRaw = Math.floor(relativeAngle / 12);
             
@@ -227,7 +233,6 @@
             const nakshatraIndexRaw = Math.floor(siderealMoon / (360 / 27));
             const vaarIndexRaw = date.getDay();
             
-            // Month Approximation (North Indian Purnimanta)
             let maasIndex = Math.floor(siderealSun / 30);
             maasIndex = (maasIndex + 1) % 12;
 
@@ -259,13 +264,29 @@
             };
         }
 
-        // --- STREAMING_CHUNK:THREE.JS VISUALIZATION ENGINE ---
+        // --- THREE.JS VISUALIZATION ENGINE ---
         let scene, camera, renderer;
         let earth, sun, moon, tithiSector;
         let orbitRadiusSun = 15;
         let orbitRadiusMoon = 5;
         let isDragging = false;
         let previousMousePosition = { x: 0, y: 0 };
+
+        // We keep the sun texture generated via canvas because it needs to look like it's glowing 
+        // from the inside rather than just reflecting light like the Earth and Moon.
+        function generateSunTexture() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 512; canvas.height = 512;
+            const ctx = canvas.getContext('2d');
+            const grd = ctx.createRadialGradient(256, 256, 0, 256, 256, 256);
+            grd.addColorStop(0, '#ffffff');
+            grd.addColorStop(0.2, '#ffea00');
+            grd.addColorStop(0.6, '#ff8c00');
+            grd.addColorStop(1, '#d50000');
+            ctx.fillStyle = grd;
+            ctx.fillRect(0, 0, 512, 512);
+            return new THREE.CanvasTexture(canvas);
+        }
 
         function init3D() {
             const container = document.getElementById('canvas-container');
@@ -280,28 +301,50 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             container.appendChild(renderer.domElement);
 
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.4);
+            // Subtle ambient light so shadowed areas aren't pitch black
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.15);
             scene.add(ambientLight);
             
-            const pointLight = new THREE.PointLight(0xffffff, 1.5, 100);
+            // The MAIN light source (PointLight inside the sun) - This creates the real lunar phases!
+            const pointLight = new THREE.PointLight(0xffffff, 2, 100);
             scene.add(pointLight);
 
-            // Earth (Center)
-            const earthGeo = new THREE.SphereGeometry(1, 32, 32);
-            const earthMat = new THREE.MeshPhongMaterial({ color: 0x3b82f6, emissive: 0x1e3a8a, flatShading: true });
+            // --- LOAD REAL TEXTURES VIA CDN ---
+            const textureLoader = new THREE.TextureLoader();
+            
+            // Earth using High-Res Diffuse and Specular Mapping
+            const earthTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/earth_atmos_2048.jpg');
+            const earthSpecular = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/earth_specular_2048.jpg');
+            
+            const earthGeo = new THREE.SphereGeometry(1, 64, 64);
+            const earthMat = new THREE.MeshPhongMaterial({ 
+                map: earthTexture,
+                specularMap: earthSpecular, // Makes oceans shiny, land dry!
+                specular: new THREE.Color(0x333333),
+                shininess: 15
+            });
             earth = new THREE.Mesh(earthGeo, earthMat);
+            // Tilt Earth roughly to its 23.5 degree axial tilt
+            earth.rotation.z = 23.5 * Math.PI / 180;
             scene.add(earth);
 
-            // Sun
+            // Sun (Self-illuminating)
             const sunGeo = new THREE.SphereGeometry(1.5, 32, 32);
-            const sunMat = new THREE.MeshBasicMaterial({ color: 0xfab12f });
+            const sunMat = new THREE.MeshBasicMaterial({ 
+                map: generateSunTexture()
+            });
             sun = new THREE.Mesh(sunGeo, sunMat);
             scene.add(sun);
-            sun.add(pointLight);
+            sun.add(pointLight); // Attach the light to the sun!
 
-            // Moon
+            // Moon using High-Res Crater Map
+            const moonTexture = textureLoader.load('https://cdn.jsdelivr.net/gh/mrdoob/three.js/examples/textures/planets/moon_1024.jpg');
             const moonGeo = new THREE.SphereGeometry(0.4, 32, 32);
-            const moonMat = new THREE.MeshStandardMaterial({ color: 0xe2e8f0, roughness: 0.8 });
+            const moonMat = new THREE.MeshStandardMaterial({ 
+                map: moonTexture,
+                roughness: 0.8, // Moon is dusty and not shiny
+                metalness: 0.1
+            });
             moon = new THREE.Mesh(moonGeo, moonMat);
             scene.add(moon);
 
@@ -343,11 +386,9 @@
             const sunRad = sunLon * Math.PI / 180;
             const moonRad = moonLon * Math.PI / 180;
             
-            // X and -Z mapped for standard rotation
             sun.position.set(Math.cos(sunRad) * orbitRadiusSun, 0, -Math.sin(sunRad) * orbitRadiusSun);
             moon.position.set(Math.cos(moonRad) * orbitRadiusMoon, 0, -Math.sin(moonRad) * orbitRadiusMoon);
 
-            // Update glowing sector representing Tithi Angle
             const sectorGeo = new THREE.CircleGeometry(orbitRadiusSun + 0.5, 64, sunRad, relAngle * Math.PI / 180);
             tithiSector.geometry.dispose();
             tithiSector.geometry = sectorGeo;
@@ -355,10 +396,15 @@
 
         function animate() {
             requestAnimationFrame(animate);
+            
+            if (earth) earth.rotation.y += 0.005;
+            if (moon) moon.rotation.y += 0.01;
+            if (sun) sun.rotation.y += 0.002;
+
             renderer.render(scene, camera);
         }
 
-        // --- STREAMING_CHUNK:App State & Logic ---
+        // --- App State & Logic ---
         let baseDate = new Date();
         let simulationOffsetDays = 0;
 
@@ -378,7 +424,6 @@
         function updateUIAndScene() {
             const simulatedDate = new Date(baseDate.getTime() + (simulationOffsetDays * 86400000));
             
-            // Using pure Hindi Locale for the gregorian date
             const dateOptions = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
             const formattedDate = new Intl.DateTimeFormat('hi-IN', dateOptions).format(simulatedDate);
             
@@ -386,7 +431,49 @@
 
             const panchang = calculatePanchang(simulatedDate);
             
-            // Left Panel
+            // --- Festival Detection Logic ---
+            const isShukla = panchang.tithi.index < 15;
+            const tithiNum = panchang.tithi.number;
+            const maasName = panchang.maas;
+            
+            let activeFestival = null;
+            
+            const FESTIVALS = [
+                { maas: "चैत्र", isShukla: true, tithiNumber: 9, name: "राम नवमी", icon: "🏹", colors: "from-orange-500 to-red-600" },
+                { maas: "श्रावण", isShukla: true, tithiNumber: 15, name: "रक्षाबंधन", icon: "🎀", colors: "from-pink-500 to-rose-500" },
+                { maas: "भाद्रपद", isShukla: false, tithiNumber: 8, name: "कृष्ण जन्माष्टमी", icon: "🦚", colors: "from-blue-600 to-indigo-800" },
+                { maas: "भाद्रपद", isShukla: true, tithiNumber: 4, name: "गणेश चतुर्थी", icon: "🐘", colors: "from-orange-500 to-red-500" },
+                { maas: "आश्विन", isShukla: true, tithiNumber: 10, name: "विजयादशमी (दशहरा)", icon: "🏹", colors: "from-yellow-500 to-orange-600" },
+                { maas: "कार्तिक", isShukla: false, tithiNumber: 15, name: "दीपावली", icon: "🪔", colors: "from-yellow-500 to-orange-600" },
+                { maas: "फाल्गुन", isShukla: false, tithiNumber: 14, name: "महाशिवरात्रि", icon: "🕉️", colors: "from-purple-600 to-blue-900" },
+                { maas: "फाल्गुन", isShukla: true, tithiNumber: 15, name: "होली", icon: "🎨", colors: "from-pink-500 to-purple-500" }
+            ];
+
+            for (const fest of FESTIVALS) {
+                if (fest.maas === maasName && fest.isShukla === isShukla && fest.tithiNumber === tithiNum) {
+                    activeFestival = fest;
+                    break;
+                }
+            }
+            
+            if (!activeFestival) {
+                const m = simulatedDate.getMonth();
+                const d = simulatedDate.getDate();
+                if (m === 0 && (d === 14 || d === 15)) {
+                    activeFestival = { name: "मकर संक्रांति", icon: "🪁", colors: "from-yellow-500 to-orange-500" };
+                }
+            }
+
+            const bannerEl = document.getElementById('festival-banner');
+            if (activeFestival) {
+                bannerEl.className = `rounded-xl p-4 mt-1 bg-gradient-to-r text-white shadow-[0_0_20px_rgba(0,0,0,0.3)] border border-white/20 relative overflow-hidden transition-all duration-500 ${activeFestival.colors}`;
+                document.getElementById('festival-name').innerText = activeFestival.name;
+                document.getElementById('festival-icon').innerText = activeFestival.icon;
+                bannerEl.classList.remove('hidden');
+            } else {
+                bannerEl.classList.add('hidden');
+            }
+
             document.getElementById('ui-tithi').innerText = panchang.tithi.name + ` (${panchang.tithi.number})`;
             document.getElementById('ui-paksha').innerText = panchang.paksha;
             document.getElementById('ui-nakshatra').innerText = panchang.nakshatra.name;
@@ -394,7 +481,6 @@
             document.getElementById('ui-vaar').innerText = panchang.vaar;
             document.getElementById('ui-samvatsar').innerText = panchang.samvatsar;
 
-            // Right Panel
             document.getElementById('ui-moon-long').innerText = panchang.angles.moonSidereal.toFixed(2) + '°';
             document.getElementById('ui-sun-long').innerText = panchang.angles.sunSidereal.toFixed(2) + '°';
             document.getElementById('ui-rel-angle').innerText = panchang.angles.relative.toFixed(2) + '°';
@@ -404,7 +490,6 @@
             update3DPositions(panchang.angles.sunTropical, panchang.angles.moonTropical, panchang.angles.relative);
         }
 
-        // Initialize App
         init3D();
         updateUIAndScene();
         
