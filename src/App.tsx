@@ -55,8 +55,8 @@ export default function App() {
 
   return (
     <div className="relative w-screen h-[100dvh] overflow-hidden bg-[#070b16] text-slate-100 select-none">
-      {/* 3D WebGL Canvas Layer (Earth, Sun, Moon, Orbits, Tithi Arc, Vedic 27 Nakshatras Ring, and 3,500+ Stars) */}
-      <CelestialCanvas panchang={panchang} />
+      {/* 3D WebGL Canvas Layer (Earth with axial tilt, Sun, Moon with tidal locking, Orbits, Tithi Arc, Vedic 27 Nakshatras Ring, and 3,500+ Stars) */}
+      <CelestialCanvas panchang={panchang} offsetDays={offsetDays} />
 
       {/* UI Overlay Layer: pointer-events-none ensures all empty canvas space is draggable and interactive */}
       <div className="pointer-events-none absolute inset-0 z-10 flex flex-col justify-between p-2 sm:p-4 md:p-5 overflow-hidden">
@@ -84,8 +84,8 @@ export default function App() {
 
         {/* Minimalist Hint Bar on Desktop */}
         <div className="hidden sm:flex justify-center pointer-events-none pb-1">
-          <div className="px-3 py-1 rounded-full bg-slate-950/70 border border-white/10 backdrop-blur-md text-[11px] text-slate-400 shadow-md">
-            <span>🖱️ Drag to rotate 3D celestial sphere • Scroll / Pinch to zoom</span>
+          <div className="px-3.5 py-1 rounded-full bg-slate-950/70 border border-white/10 backdrop-blur-md text-[11px] text-slate-400 shadow-md">
+            <span>🖱️ Drag to rotate 3D celestial sphere • Scroll / Pinch to zoom • Moon faces Earth (Tidal Locked)</span>
           </div>
         </div>
       </div>
