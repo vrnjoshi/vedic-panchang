@@ -1,0 +1,6 @@
+{
+  "name": "Vedic Panchang 3D",
+  "description": "Interactive 3D celestial Vedic Panchang simulator featuring Sun, Moon, Earth positions, Tithi angles, Nakshatras, and astronomical calculations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
