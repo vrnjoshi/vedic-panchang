@@ -5,13 +5,14 @@ export interface CelestialAngles {
   moonSidereal: number;
   relative: number;
   ayanamsa: number;
+  moonLatitude?: number;
 }
 
 export interface TithiInfo {
   index: number;
   name: string;
   number: number;
-  paksha: 'शुक्ल पक्ष' | 'कृष्ण पक्ष';
+  paksha: string;
   progressPercent: number;
 }
 

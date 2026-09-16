@@ -1,44 +1,44 @@
 import { CelestialAngles, FestivalInfo, PanchangData } from '../types';
 
 export const TITHI_NAMES = [
-  "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", 
-  "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी", 
-  "नवमी", "दशमी", "एकादशी", "द्वादशी", 
-  "त्रयोदशी", "चतुर्दशी", "पूर्णिमा", 
-  "प्रतिपदा", "द्वितीया", "तृतीया", "चतुर्थी", 
-  "पंचमी", "षष्ठी", "सप्तमी", "अष्टमी", 
-  "नवमी", "दशमी", "एकादशी", "द्वादशी", 
-  "त्रयोदशी", "चतुर्दशी", "अमावस्या"
+  "प्रतिपदा (Pratipada)", "द्वितीया (Dwitiya)", "तृतीया (Tritiya)", "चतुर्थी (Chaturthi)", 
+  "पंचमी (Panchami)", "षष्ठी (Shashthi)", "सप्तमी (Saptami)", "अष्टमी (Ashtami)", 
+  "नवमी (Navami)", "दशमी (Dashami)", "एकादशी (Ekadashi)", "द्वादशी (Dwadashi)", 
+  "त्रयोदशी (Trayodashi)", "चतुर्दशी (Chaturdashi)", "पूर्णिमा (Purnima)", 
+  "प्रतिपदा (Pratipada)", "द्वितीया (Dwitiya)", "तृतीया (Tritiya)", "चतुर्थी (Chaturthi)", 
+  "पंचमी (Panchami)", "षष्ठी (Shashthi)", "सप्तमी (Saptami)", "अष्टमी (Ashtami)", 
+  "नवमी (Navami)", "दशमी (Dashami)", "एकादशी (Ekadashi)", "द्वादशी (Dwadashi)", 
+  "त्रयोदशी (Trayodashi)", "चतुर्दशी (Chaturdashi)", "अमावस्या (Amavasya)"
 ];
 
 export const NAKSHATRA_NAMES = [
-  { name: "अश्विनी (Ashwini)", lord: "केतु" },
-  { name: "भरणी (Bharani)", lord: "शुक्र" },
-  { name: "कृत्तिका (Krittika)", lord: "सूर्य" },
-  { name: "रोहिणी (Rohini)", lord: "चन्द्र" },
-  { name: "मृगशीर्ष (Mrigashira)", lord: "मंगल" },
-  { name: "आर्द्रा (Ardra)", lord: "राहु" },
-  { name: "पुनर्वसु (Punarvasu)", lord: "गुरु" },
-  { name: "पुष्य (Pushya)", lord: "शनि" },
-  { name: "आश्लेषा (Ashlesha)", lord: "बुध" },
-  { name: "मघा (Magha)", lord: "केतु" },
-  { name: "पूर्व फाल्गुनी (Purva Phalguni)", lord: "शुक्र" },
-  { name: "उत्तर फाल्गुनी (Uttara Phalguni)", lord: "सूर्य" },
-  { name: "हस्त (Hasta)", lord: "चन्द्र" },
-  { name: "चित्रा (Chitra)", lord: "मंगल" },
-  { name: "स्वाति (Swati)", lord: "राहु" },
-  { name: "विशाखा (Vishakha)", lord: "गुरु" },
-  { name: "अनुराधा (Anuradha)", lord: "शनि" },
-  { name: "ज्येष्ठा (Jyeshtha)", lord: "बुध" },
-  { name: "मूल (Mula)", lord: "केतु" },
-  { name: "पूर्वाषाढ़ा (Purva Ashadha)", lord: "शुक्र" },
-  { name: "उत्तराषाढ़ा (Uttara Ashadha)", lord: "सूर्य" },
-  { name: "श्रवण (Shravana)", lord: "चन्द्र" },
-  { name: "धनिष्ठा (Dhanishta)", lord: "मंगल" },
-  { name: "शतभिषा (Shatabhisha)", lord: "राहु" },
-  { name: "पूर्व भाद्रपद (Purva Bhadrapada)", lord: "गुरु" },
-  { name: "उत्तर भाद्रपद (Uttara Bhadrapada)", lord: "शनि" },
-  { name: "रेवती (Revati)", lord: "बुध" }
+  { name: "अश्विनी (Ashwini)", lord: "केतु (Ketu)" },
+  { name: "भरणी (Bharani)", lord: "शुक्र (Venus)" },
+  { name: "कृत्तिका (Krittika)", lord: "सूर्य (Sun)" },
+  { name: "रोहिणी (Rohini)", lord: "चन्द्र (Moon)" },
+  { name: "मृगशीर्ष (Mrigashira)", lord: "मंगल (Mars)" },
+  { name: "आर्द्रा (Ardra)", lord: "राहु (Rahu)" },
+  { name: "पुनर्वसु (Punarvasu)", lord: "गुरु (Jupiter)" },
+  { name: "पुष्य (Pushya)", lord: "शनि (Saturn)" },
+  { name: "आश्लेषा (Ashlesha)", lord: "बुध (Mercury)" },
+  { name: "मघा (Magha)", lord: "केतु (Ketu)" },
+  { name: "पूर्व फाल्गुनी (Purva Phalguni)", lord: "शुक्र (Venus)" },
+  { name: "उत्तर फाल्गुनी (Uttara Phalguni)", lord: "सूर्य (Sun)" },
+  { name: "हस्त (Hasta)", lord: "चन्द्र (Moon)" },
+  { name: "चित्रा (Chitra)", lord: "मंगल (Mars)" },
+  { name: "स्वाति (Swati)", lord: "राहु (Rahu)" },
+  { name: "विशाखा (Vishakha)", lord: "गुरु (Jupiter)" },
+  { name: "अनुराधा (Anuradha)", lord: "शनि (Saturn)" },
+  { name: "ज्येष्ठा (Jyeshtha)", lord: "बुध (Mercury)" },
+  { name: "मूल (Mula)", lord: "केतु (Ketu)" },
+  { name: "पूर्वाषाढ़ा (Purva Ashadha)", lord: "शुक्र (Venus)" },
+  { name: "उत्तराषाढ़ा (Uttara Ashadha)", lord: "सूर्य (Sun)" },
+  { name: "श्रवण (Shravana)", lord: "चन्द्र (Moon)" },
+  { name: "धनिष्ठा (Dhanishta)", lord: "मंगल (Mars)" },
+  { name: "शतभिषा (Shatabhisha)", lord: "राहु (Rahu)" },
+  { name: "पूर्व भाद्रपद (Purva Bhadrapada)", lord: "गुरु (Jupiter)" },
+  { name: "उत्तर भाद्रपद (Uttara Bhadrapada)", lord: "शनि (Saturn)" },
+  { name: "रेवती (Revati)", lord: "बुध (Mercury)" }
 ];
 
 export const VAAR_NAMES = [
@@ -60,15 +60,19 @@ export const RASHI_NAMES = [
 ];
 
 export const YOGA_NAMES = [
-  "विष्कुम्भ", "प्रीति", "आयुष्मान", "सौभाग्य", "शोभन", "अतिगण्ड", "सुकर्मा", "धृति",
-  "शूल", "गण्ड", "वृद्धि", "ध्रुव", "व्याघात", "हर्षण", "वज्र", "सिद्धि",
-  "व्यतीपात", "वरीयान्", "परिघ", "शिव", "सिद्ध", "साध्य", "शुभ", "शुक्ल",
-  "ब्रह्म", "इन्द्र", "वैधृति"
+  "विष्कुम्भ (Vishkumbha)", "प्रीति (Priti)", "आयुष्मान (Ayushman)", "सौभाग्य (Saubhagya)", 
+  "शोभन (Shobhana)", "अतिगण्ड (Atiganda)", "सुकर्मा (Sukarma)", "धृति (Dhriti)",
+  "शूल (Shula)", "गण्ड (Ganda)", "वृद्धि (Vriddhi)", "ध्रुव (Dhruva)", 
+  "व्याघात (Vyaghata)", "हर्षण (Harshana)", "वज्र (Vajra)", "सिद्धि (Siddhi)",
+  "व्यतीपात (Vyatipata)", "वरीयान् (Variyan)", "परिघ (Parigha)", "शिव (Shiva)", 
+  "सिद्ध (Siddha)", "साध्य (Sadhya)", "शुभ (Shubha)", "शुक्ल (Shukla)",
+  "ब्रह्म (Brahma)", "इन्द्र (Indra)", "वैधृति (Vaidhriti)"
 ];
 
 export const KARANA_NAMES = [
-  "बव", "बालव", "कौलव", "तैतिल", "गर", "वणिज", "विष्टि (भद्रा)",
-  "शकुनि", "चतुष्पाद", "नाग", "किंस्तुघ्न"
+  "बव (Bava)", "बालव (Balava)", "कौलव (Kaulava)", "तैतिल (Taitila)", 
+  "गर (Gara)", "वणिज (Vanija)", "विष्टि/भद्रा (Vishti/Bhadra)",
+  "शकुनि (Shakuni)", "चतुष्पाद (Chatushpada)", "नाग (Naga)", "किंस्तुघ्न (Kinstughna)"
 ];
 
 export const MAJOR_FESTIVALS: FestivalInfo[] = [
@@ -143,6 +147,9 @@ export function calculatePanchang(date: Date): PanchangData {
     0.114 * Math.sin(2 * F_rad)
   );
 
+  // Moon's Ecliptic Latitude (inclination of lunar orbit to ecliptic is ~5.145°, creating up to ~5.2° latitude)
+  const moonLatitude = 5.128 * Math.sin(F_rad) + 0.281 * Math.sin(Mp_rad + F_rad);
+
   // Lahiri Ayanamsa computation
   const ayanamsa = 23.85 + (1.396 / 100) * ((date.getFullYear() - 2000) + (month / 12));
   const siderealSun = normalizeAngle(tropicalSun - ayanamsa);
@@ -155,7 +162,7 @@ export function calculatePanchang(date: Date): PanchangData {
   const tithiProgressPercent = Math.round((tithiAngleRem / 12) * 100);
 
   const isShukla = tithiIndexRaw < 15;
-  const pakshaName = isShukla ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
+  const pakshaName = isShukla ? "शुक्ल पक्ष (Waxing / Shukla)" : "कृष्ण पक्ष (Waning / Krishna)";
   const tithiNumber = (tithiIndexRaw % 15) + 1;
 
   // Nakshatra: 360 / 27 = 13.333333 degrees each
@@ -205,7 +212,8 @@ export function calculatePanchang(date: Date): PanchangData {
     sunSidereal: siderealSun,
     moonSidereal: siderealMoon,
     relative: relativeAngle,
-    ayanamsa: ayanamsa
+    ayanamsa: ayanamsa,
+    moonLatitude: parseFloat(moonLatitude.toFixed(2))
   };
 
   return {
@@ -215,7 +223,7 @@ export function calculatePanchang(date: Date): PanchangData {
       index: tithiIndexRaw,
       name: TITHI_NAMES[tithiIndexRaw],
       number: tithiNumber,
-      paksha: isShukla ? 'शुक्ल पक्ष' : 'कृष्ण पक्ष',
+      paksha: isShukla ? 'शुक्ल पक्ष (Waxing / Shukla)' : 'कृष्ण पक्ष (Waning / Krishna)',
       progressPercent: tithiProgressPercent
     },
     paksha: pakshaName,
@@ -235,4 +243,33 @@ export function calculatePanchang(date: Date): PanchangData {
     karana: karanaName,
     activeFestival: matchedFestival
   };
+}
+
+/**
+ * Accurately finds the orbital day offset to align the 3D celestial canvas
+ * and panchang directly with any festival occurrence (past or future).
+ */
+export function findExactFestivalOffset(festHindiName: string, baseDate: Date): number {
+  const fest = MAJOR_FESTIVALS.find(
+    (f) => f.hindiName.includes(festHindiName) || f.name.toLowerCase().includes(festHindiName.toLowerCase())
+  );
+  if (!fest) return 0;
+
+  let bestOffset = 0;
+  let minDiff = Infinity;
+
+  // Search dynamically within +/- 380 days in fine fractional steps
+  for (let d = -380; d <= 380; d = parseFloat((d + 0.1).toFixed(2))) {
+    const testDate = new Date(baseDate.getTime() + d * 86400000);
+    const p = calculatePanchang(testDate);
+    if (p.activeFestival && p.activeFestival.name === fest.name) {
+      const dist = Math.abs(d);
+      if (dist < minDiff) {
+        minDiff = dist;
+        bestOffset = d;
+      }
+    }
+  }
+
+  return bestOffset;
 }
