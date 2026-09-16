@@ -65,6 +65,7 @@ export default function App() {
           {/* Left Panel: Panchang Information */}
           <LeftPanel
             panchang={panchang}
+            baseDate={baseDate}
             isMinimized={isLeftMinimized}
             onToggleMinimize={handleToggleLeft}
             offsetDays={offsetDays}
@@ -72,13 +73,11 @@ export default function App() {
             onFestivalSelect={handleFestivalSelect}
           />
 
-          {/* Right Panel: Time Simulator, Math, and Coordinate Calculations */}
+          {/* Right Panel: Astronomical Math, Nakshatra Spotlight, and Coordinate Calculations */}
           <RightPanel
             panchang={panchang}
             isMinimized={isRightMinimized}
             onToggleMinimize={handleToggleRight}
-            offsetDays={offsetDays}
-            onOffsetChange={(days) => setOffsetDays(days)}
           />
         </div>
 

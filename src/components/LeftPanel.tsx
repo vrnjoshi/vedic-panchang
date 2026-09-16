@@ -11,9 +11,11 @@ import {
 } from 'lucide-react';
 import { PanchangData, FestivalInfo } from '../types';
 import { VEDIC_NAKSHATRAS } from '../data/nakshatras';
+import { findExactFestivalOffset } from '../utils/panchang';
 
 interface LeftPanelProps {
   panchang: PanchangData;
+  baseDate: Date;
   isMinimized: boolean;
   onToggleMinimize: () => void;
   offsetDays: number;
@@ -23,6 +25,7 @@ interface LeftPanelProps {
 
 export const LeftPanel: React.FC<LeftPanelProps> = ({
   panchang,
+  baseDate,
   isMinimized,
   onToggleMinimize,
   offsetDays,
@@ -45,6 +48,23 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
     year: 'numeric',
   }).format(panchang.date);
 
+  // Pre-calculate exact astronomical alignments for the festival buttons based on baseDate
+  const festivalButtons = React.useMemo(() => {
+    return [
+      { name: "दीपावली (Diwali)", search: "दीपावली", icon: "🪔" },
+      { name: "होली (Holi)", search: "होली", icon: "🎨" },
+      { name: "महाशिवरात्रि (Shivaratri)", search: "महाशिवरात्रि", icon: "🕉️" },
+      { name: "श्रीकृष्ण जन्माष्टमी (Janmashtami)", search: "कृष्ण", icon: "🦚" },
+      { name: "श्रीराम नवमी (Ram Navami)", search: "राम", icon: "🏹" },
+    ].map((fest) => {
+      const offset = findExactFestivalOffset(fest.search, baseDate);
+      return {
+        ...fest,
+        offset,
+      };
+    });
+  }, [baseDate]);
+
   // If minimized, render ONLY a compact floating pill
   if (isMinimized) {
     return (
@@ -56,7 +76,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           title="Click to expand Vedic Panchang details"
         >
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-          <span className="tracking-wide shrink-0">वैदिक पंचांग</span>
+          <span className="tracking-wide shrink-0">वैदिक पंचांग (Panchang)</span>
           <span className="text-slate-400 font-normal shrink-0">|</span>
           <span className="text-blue-300 font-bold truncate">{panchang.tithi.name} ({panchang.paksha})</span>
           <Maximize2 className="w-3.5 h-3.5 text-amber-300/70 group-hover:text-amber-200 ml-0.5 shrink-0" />
@@ -78,10 +98,10 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           </div>
           <div className="min-w-0 flex-1">
             <h1 className="text-lg sm:text-xl font-bold text-white tracking-tight leading-tight truncate">
-              वैदिक पंचांग
+              वैदिक पंचांग (Vedic Panchang)
             </h1>
             <p className="text-[11px] sm:text-xs text-amber-200/80 font-medium truncate">
-              उत्तर भारतीय प्रणाली (पूर्णिमांत)
+              उत्तर भारतीय प्रणाली (Purnimanta System)
             </p>
           </div>
         </div>
@@ -169,7 +189,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             <p className="text-xs sm:text-sm font-semibold text-slate-100 break-words leading-snug">{formattedDate}</p>
             <div className="flex items-center gap-1.5 text-[11px] sm:text-xs text-slate-400 mt-1">
               <MapPin className="w-3.5 h-3.5 text-orange-400 shrink-0" />
-              <span className="break-words">स्थानीय समय व निर्देशांक (Geocentric)</span>
+              <span className="break-words">स्थानीय समय व निर्देशांक (Geocentric Coordinates)</span>
             </div>
           </div>
 
@@ -178,15 +198,15 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             <div className="flex justify-between items-center text-xs">
               <span className="text-slate-300 font-medium">समय चक्र (Time Offset):</span>
               <span className="text-amber-300 font-mono font-bold bg-white/10 px-2 py-0.5 rounded text-xs whitespace-nowrap">
-                {offsetDays > 0 ? `+${offsetDays.toFixed(1)} दिन` : `${offsetDays.toFixed(1)} दिन`}
+                {offsetDays > 0 ? `+${offsetDays.toFixed(1)} दिन (Days)` : `${offsetDays.toFixed(1)} दिन (Days)`}
               </span>
             </div>
 
             <input
               id="time-slider-left"
               type="range"
-              min="-30"
-              max="30"
+              min="-220"
+              max="220"
               step="0.2"
               value={offsetDays}
               onChange={(e) => onOffsetChange(parseFloat(e.target.value))}
@@ -194,9 +214,9 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             />
 
             <div className="flex justify-between items-center text-[11px] text-slate-400">
-              <span className="shrink-0">-30 दिन</span>
-              <span className="text-slate-300 font-medium text-center truncate px-1">तिथियों व नक्षत्रों का चक्र</span>
-              <span className="shrink-0">+30 दिन</span>
+              <span className="shrink-0">-220 दिन (Days)</span>
+              <span className="text-slate-300 font-medium text-center truncate px-1">सम्पूर्ण वार्षिक सौर-चान्द्र चक्र (Annual Solar-Lunar Cycle)</span>
+              <span className="shrink-0">+220 दिन (Days)</span>
             </div>
           </div>
         </div>
@@ -207,26 +227,21 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
           <div className="flex justify-between items-center bg-white/[0.04] p-2.5 sm:p-3 rounded-xl border border-white/10 gap-2">
             <div className="flex flex-col min-w-0 flex-1">
               <span className="text-slate-400 text-[11px] sm:text-xs uppercase font-semibold">तिथि (Tithi)</span>
-              <span className="text-slate-200 text-xs sm:text-sm font-medium">{panchang.paksha} पक्ष</span>
+              <span className="text-slate-200 text-xs sm:text-sm font-medium">{panchang.paksha}</span>
             </div>
             <div className="text-right shrink-0">
               <span className="text-base sm:text-lg font-bold text-sky-300 block whitespace-nowrap">{panchang.tithi.name}</span>
-              <span className="text-xs text-sky-400 font-medium font-mono whitespace-nowrap">तिथि {panchang.tithi.number} / 15</span>
+              <span className="text-xs text-sky-400 font-medium font-mono whitespace-nowrap">तिथि (Tithi) {panchang.tithi.number} / 15</span>
             </div>
           </div>
 
-          {/* Nakshatra with large ritual emoji symbol */}
+          {/* Nakshatra compact attribute in Panchang Core */}
           <div className="flex justify-between items-center bg-white/[0.04] p-2.5 sm:p-3 rounded-xl border border-white/10 gap-2">
-            <div className="flex items-center gap-2.5 min-w-0 flex-1">
-              <span className="text-2xl sm:text-3xl select-none shrink-0" title="वैदिक नक्षत्र प्रतीक">
-                {VEDIC_NAKSHATRAS[panchang.nakshatra.index]?.emoji || "⭐"}
+            <div className="flex flex-col min-w-0 flex-1">
+              <span className="text-slate-400 text-[11px] sm:text-xs uppercase font-semibold">नक्षत्र (Nakshatra)</span>
+              <span className="text-slate-300 text-xs break-words leading-tight mt-0.5">
+                स्वामी (Lord): {panchang.nakshatra.lord}
               </span>
-              <div className="flex flex-col min-w-0 flex-1">
-                <span className="text-slate-400 text-[11px] sm:text-xs uppercase font-semibold">नक्षत्र (Nakshatra)</span>
-                <span className="text-slate-300 text-xs break-words leading-tight mt-0.5">
-                  {VEDIC_NAKSHATRAS[panchang.nakshatra.index]?.symbolName || `स्वामी: ${panchang.nakshatra.lord}`}
-                </span>
-              </div>
             </div>
             <div className="text-right shrink-0">
               <span className="text-base sm:text-lg font-bold text-purple-300 block whitespace-nowrap">{panchang.nakshatra.name}</span>
@@ -242,7 +257,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             </div>
             <div className="bg-white/[0.04] p-2.5 sm:p-3 rounded-xl border border-white/10">
               <span className="text-slate-400 text-[11px] sm:text-xs uppercase font-semibold block">वार (Day)</span>
-              <span className="text-xs sm:text-sm font-bold text-white mt-0.5 block break-words leading-snug">{panchang.vaar.split(' ')[0]}</span>
+              <span className="text-xs sm:text-sm font-bold text-white mt-0.5 block break-words leading-snug">{panchang.vaar}</span>
             </div>
           </div>
 
@@ -272,13 +287,13 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
 
           {/* Samvatsar & Manvantar */}
           <div className="flex justify-between items-center bg-white/[0.03] px-3 py-2 rounded-xl border border-white/10 text-xs gap-2">
-            <span className="text-slate-400 font-medium">विक्रम संवत्सर (Samvat)</span>
+            <span className="text-slate-400 font-medium">विक्रम संवत्सर (Vikram Samvat)</span>
             <span className="text-slate-100 font-bold break-words">{panchang.samvatsar}</span>
           </div>
 
           <div className="flex justify-between items-center bg-white/[0.03] px-3 py-2 rounded-xl border border-white/10 text-xs gap-2">
             <span className="text-slate-400 font-medium">मन्वन्तर (Manvantara)</span>
-            <span className="text-slate-200 font-medium break-words">वैवस्वत मन्वन्तर (सातवाँ)</span>
+            <span className="text-slate-200 font-medium break-words">वैवस्वत मन्वन्तर (7th Vaivasvata)</span>
           </div>
         </div>
 
@@ -288,13 +303,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
             पर्व दर्शन (Festival Alignments)
           </span>
           <div className="flex flex-wrap gap-1.5 sm:gap-2">
-            {[
-              { name: "दीपावली", offset: 45, icon: "🪔" },
-              { name: "होली", offset: 160, icon: "🎨" },
-              { name: "महाशिवरात्रि", offset: 145, icon: "🕉️" },
-              { name: "श्रीकृष्ण जन्माष्टमी", offset: -20, icon: "🦚" },
-              { name: "श्रीराम नवमी", offset: 200, icon: "🏹" },
-            ].map((fest) => (
+            {festivalButtons.map((fest) => (
               <button
                 key={fest.name}
                 onClick={() => onOffsetChange(fest.offset)}
