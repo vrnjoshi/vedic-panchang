@@ -1,97 +1,169 @@
 import { CelestialAngles, FestivalInfo, PanchangData } from '../types';
 
 export const TITHI_NAMES = [
-  "प्रतिपदा (Pratipada)", "द्वितीया (Dwitiya)", "तृतीया (Tritiya)", "चतुर्थी (Chaturthi)", 
-  "पंचमी (Panchami)", "षष्ठी (Shashthi)", "सप्तमी (Saptami)", "अष्टमी (Ashtami)", 
-  "नवमी (Navami)", "दशमी (Dashami)", "एकादशी (Ekadashi)", "द्वादशी (Dwadashi)", 
-  "त्रयोदशी (Trayodashi)", "चतुर्दशी (Chaturdashi)", "पूर्णिमा (Purnima)", 
-  "प्रतिपदा (Pratipada)", "द्वितीया (Dwitiya)", "तृतीया (Tritiya)", "चतुर्थी (Chaturthi)", 
-  "पंचमी (Panchami)", "षष्ठी (Shashthi)", "सप्तमी (Saptami)", "अष्टमी (Ashtami)", 
-  "नवमी (Navami)", "दशमी (Dashami)", "एकादशी (Ekadashi)", "द्वादशी (Dwadashi)", 
-  "त्रयोदशी (Trayodashi)", "चतुर्दशी (Chaturdashi)", "अमावस्या (Amavasya)"
+  { hi: "प्रतिपदा", en: "Pratipada" },
+  { hi: "द्वितीया", en: "Dwitiya" },
+  { hi: "तृतीया", en: "Tritiya" },
+  { hi: "चतुर्थी", en: "Chaturthi" },
+  { hi: "पंचमी", en: "Panchami" },
+  { hi: "षष्ठी", en: "Shashthi" },
+  { hi: "सप्तमी", en: "Saptami" },
+  { hi: "अष्टमी", en: "Ashtami" },
+  { hi: "नवमी", en: "Navami" },
+  { hi: "दशमी", en: "Dashami" },
+  { hi: "एकादशी", en: "Ekadashi" },
+  { hi: "द्वादशी", en: "Dwadashi" },
+  { hi: "त्रयोदशी", en: "Trayodashi" },
+  { hi: "चतुर्दशी", en: "Chaturdashi" },
+  { hi: "पूर्णिमा", en: "Purnima" },
+  { hi: "प्रतिपदा", en: "Pratipada" },
+  { hi: "द्वितीया", en: "Dwitiya" },
+  { hi: "तृतीया", en: "Tritiya" },
+  { hi: "चतुर्थी", en: "Chaturthi" },
+  { hi: "पंचमी", en: "Panchami" },
+  { hi: "षष्ठी", en: "Shashthi" },
+  { hi: "सप्तमी", en: "Saptami" },
+  { hi: "अष्टमी", en: "Ashtami" },
+  { hi: "नवमी", en: "Navami" },
+  { hi: "दशमी", en: "Dashami" },
+  { hi: "एकादशी", en: "Ekadashi" },
+  { hi: "द्वादशी", en: "Dwadashi" },
+  { hi: "त्रयोदशी", en: "Trayodashi" },
+  { hi: "चतुर्दशी", en: "Chaturdashi" },
+  { hi: "अमावस्या", en: "Amavasya" }
 ];
 
 export const NAKSHATRA_NAMES = [
-  { name: "अश्विनी (Ashwini)", lord: "केतु (Ketu)" },
-  { name: "भरणी (Bharani)", lord: "शुक्र (Venus)" },
-  { name: "कृत्तिका (Krittika)", lord: "सूर्य (Sun)" },
-  { name: "रोहिणी (Rohini)", lord: "चन्द्र (Moon)" },
-  { name: "मृगशीर्ष (Mrigashira)", lord: "मंगल (Mars)" },
-  { name: "आर्द्रा (Ardra)", lord: "राहु (Rahu)" },
-  { name: "पुनर्वसु (Punarvasu)", lord: "गुरु (Jupiter)" },
-  { name: "पुष्य (Pushya)", lord: "शनि (Saturn)" },
-  { name: "आश्लेषा (Ashlesha)", lord: "बुध (Mercury)" },
-  { name: "मघा (Magha)", lord: "केतु (Ketu)" },
-  { name: "पूर्व फाल्गुनी (Purva Phalguni)", lord: "शुक्र (Venus)" },
-  { name: "उत्तर फाल्गुनी (Uttara Phalguni)", lord: "सूर्य (Sun)" },
-  { name: "हस्त (Hasta)", lord: "चन्द्र (Moon)" },
-  { name: "चित्रा (Chitra)", lord: "मंगल (Mars)" },
-  { name: "स्वाति (Swati)", lord: "राहु (Rahu)" },
-  { name: "विशाखा (Vishakha)", lord: "गुरु (Jupiter)" },
-  { name: "अनुराधा (Anuradha)", lord: "शनि (Saturn)" },
-  { name: "ज्येष्ठा (Jyeshtha)", lord: "बुध (Mercury)" },
-  { name: "मूल (Mula)", lord: "केतु (Ketu)" },
-  { name: "पूर्वाषाढ़ा (Purva Ashadha)", lord: "शुक्र (Venus)" },
-  { name: "उत्तराषाढ़ा (Uttara Ashadha)", lord: "सूर्य (Sun)" },
-  { name: "श्रवण (Shravana)", lord: "चन्द्र (Moon)" },
-  { name: "धनिष्ठा (Dhanishta)", lord: "मंगल (Mars)" },
-  { name: "शतभिषा (Shatabhisha)", lord: "राहु (Rahu)" },
-  { name: "पूर्व भाद्रपद (Purva Bhadrapada)", lord: "गुरु (Jupiter)" },
-  { name: "उत्तर भाद्रपद (Uttara Bhadrapada)", lord: "शनि (Saturn)" },
-  { name: "रेवती (Revati)", lord: "बुध (Mercury)" }
+  { name: "अश्विनी", nameEn: "Ashwini", lord: "केतु", lordEn: "Ketu" },
+  { name: "भरणी", nameEn: "Bharani", lord: "शुक्र", lordEn: "Venus" },
+  { name: "कृत्तिका", nameEn: "Krittika", lord: "सूर्य", lordEn: "Sun" },
+  { name: "रोहिणी", nameEn: "Rohini", lord: "चन्द्र", lordEn: "Moon" },
+  { name: "मृगशीर्ष", nameEn: "Mrigashira", lord: "मंगल", lordEn: "Mars" },
+  { name: "आर्द्रा", nameEn: "Ardra", lord: "राहु", lordEn: "Rahu" },
+  { name: "पुनर्वसु", nameEn: "Punarvasu", lord: "गुरु", lordEn: "Jupiter" },
+  { name: "पुष्य", nameEn: "Pushya", lord: "शनि", lordEn: "Saturn" },
+  { name: "आश्लेषा", nameEn: "Ashlesha", lord: "बुध", lordEn: "Mercury" },
+  { name: "मघा", nameEn: "Magha", lord: "केतु", lordEn: "Ketu" },
+  { name: "पूर्व फाल्गुनी", nameEn: "Purva Phalguni", lord: "शुक्र", lordEn: "Venus" },
+  { name: "उत्तर फाल्गुनी", nameEn: "Uttara Phalguni", lord: "सूर्य", lordEn: "Sun" },
+  { name: "हस्त", nameEn: "Hasta", lord: "चन्द्र", lordEn: "Moon" },
+  { name: "चित्रा", nameEn: "Chitra", lord: "मंगल", lordEn: "Mars" },
+  { name: "स्वाति", nameEn: "Swati", lord: "राहु", lordEn: "Rahu" },
+  { name: "विशाखा", nameEn: "Vishakha", lord: "गुरु", lordEn: "Jupiter" },
+  { name: "अनुराधा", nameEn: "Anuradha", lord: "शनि", lordEn: "Saturn" },
+  { name: "ज्येष्ठा", nameEn: "Jyeshtha", lord: "बुध", lordEn: "Mercury" },
+  { name: "मूल", nameEn: "Mula", lord: "केतु", lordEn: "Ketu" },
+  { name: "पूर्वाषाढ़ा", nameEn: "Purva Ashadha", lord: "शुक्र", lordEn: "Venus" },
+  { name: "उत्तराषाढ़ा", nameEn: "Uttara Ashadha", lord: "सूर्य", lordEn: "Sun" },
+  { name: "श्रवण", nameEn: "Shravana", lord: "चन्द्र", lordEn: "Moon" },
+  { name: "धनिष्ठा", nameEn: "Dhanishta", lord: "मंगल", lordEn: "Mars" },
+  { name: "शतभिषा", nameEn: "Shatabhisha", lord: "राहु", lordEn: "Rahu" },
+  { name: "पूर्व भाद्रपद", nameEn: "Purva Bhadrapada", lord: "गुरु", lordEn: "Jupiter" },
+  { name: "उत्तर भाद्रपद", nameEn: "Uttara Bhadrapada", lord: "शनि", lordEn: "Saturn" },
+  { name: "रेवती", nameEn: "Revati", lord: "बुध", lordEn: "Mercury" }
 ];
 
 export const VAAR_NAMES = [
-  "रविवार (Sunday)", "सोमवार (Monday)", "मंगलवार (Tuesday)", 
-  "बुधवार (Wednesday)", "गुरुवार (Thursday)", "शुक्रवार (Friday)", 
-  "शनिवार (Saturday)"
+  { hi: "रविवार", en: "Sunday" },
+  { hi: "सोमवार", en: "Monday" },
+  { hi: "मंगलवार", en: "Tuesday" },
+  { hi: "बुधवार", en: "Wednesday" },
+  { hi: "गुरुवार", en: "Thursday" },
+  { hi: "शुक्रवार", en: "Friday" },
+  { hi: "शनिवार", en: "Saturday" }
 ];
 
 export const MAAS_NAMES = [
-  "चैत्र (Chaitra)", "वैशाख (Vaisakha)", "ज्येष्ठ (Jyeshtha)", "आषाढ़ (Ashadha)", 
-  "श्रावण (Shravana)", "भाद्रपद (Bhadrapada)", "आश्विन (Ashwin)", "कार्तिक (Kartika)", 
-  "मार्गशीर्ष (Margashirsha)", "पौष (Pausha)", "माघ (Magha)", "फाल्गुन (Phalguna)"
+  { hi: "चैत्र", en: "Chaitra" },
+  { hi: "वैशाख", en: "Vaisakha" },
+  { hi: "ज्येष्ठ", en: "Jyeshtha" },
+  { hi: "आषाढ़", en: "Ashadha" },
+  { hi: "श्रावण", en: "Shravana" },
+  { hi: "भाद्रपद", en: "Bhadrapada" },
+  { hi: "आश्विन", en: "Ashwin" },
+  { hi: "कार्तिक", en: "Kartika" },
+  { hi: "मार्गशीर्ष", en: "Margashirsha" },
+  { hi: "पौष", en: "Pausha" },
+  { hi: "माघ", en: "Magha" },
+  { hi: "फाल्गुन", en: "Phalguna" }
 ];
 
 export const RASHI_NAMES = [
-  "मेष (Aries)", "वृषभ (Taurus)", "मिथुन (Gemini)", "कर्क (Cancer)",
-  "सिंह (Leo)", "कन्या (Virgo)", "तुला (Libra)", "वृश्चिक (Scorpio)",
-  "धनु (Sagittarius)", "मकर (Capricorn)", "कुम्भ (Aquarius)", "मीन (Pisces)"
+  { hi: "मेष", en: "Aries" },
+  { hi: "वृषभ", en: "Taurus" },
+  { hi: "मिथुन", en: "Gemini" },
+  { hi: "कर्क", en: "Cancer" },
+  { hi: "सिंह", en: "Leo" },
+  { hi: "कन्या", en: "Virgo" },
+  { hi: "तुला", en: "Libra" },
+  { hi: "वृश्चिक", en: "Scorpio" },
+  { hi: "धनु", en: "Sagittarius" },
+  { hi: "मकर", en: "Capricorn" },
+  { hi: "कुम्भ", en: "Aquarius" },
+  { hi: "मीन", en: "Pisces" }
 ];
 
 export const YOGA_NAMES = [
-  "विष्कुम्भ (Vishkumbha)", "प्रीति (Priti)", "आयुष्मान (Ayushman)", "सौभाग्य (Saubhagya)", 
-  "शोभन (Shobhana)", "अतिगण्ड (Atiganda)", "सुकर्मा (Sukarma)", "धृति (Dhriti)",
-  "शूल (Shula)", "गण्ड (Ganda)", "वृद्धि (Vriddhi)", "ध्रुव (Dhruva)", 
-  "व्याघात (Vyaghata)", "हर्षण (Harshana)", "वज्र (Vajra)", "सिद्धि (Siddhi)",
-  "व्यतीपात (Vyatipata)", "वरीयान् (Variyan)", "परिघ (Parigha)", "शिव (Shiva)", 
-  "सिद्ध (Siddha)", "साध्य (Sadhya)", "शुभ (Shubha)", "शुक्ल (Shukla)",
-  "ब्रह्म (Brahma)", "इन्द्र (Indra)", "वैधृति (Vaidhriti)"
+  { hi: "विष्कुम्भ", en: "Vishkumbha" },
+  { hi: "प्रीति", en: "Priti" },
+  { hi: "आयुष्मान", en: "Ayushman" },
+  { hi: "सौभाग्य", en: "Saubhagya" },
+  { hi: "शोभन", en: "Shobhana" },
+  { hi: "अतिगण्ड", en: "Atiganda" },
+  { hi: "सुकर्मा", en: "Sukarma" },
+  { hi: "धृति", en: "Dhriti" },
+  { hi: "शूल", en: "Shula" },
+  { hi: "गण्ड", en: "Ganda" },
+  { hi: "वृद्धि", en: "Vriddhi" },
+  { hi: "ध्रुव", en: "Dhruva" },
+  { hi: "व्याघात", en: "Vyaghata" },
+  { hi: "हर्षण", en: "Harshana" },
+  { hi: "वज्र", en: "Vajra" },
+  { hi: "सिद्धि", en: "Siddhi" },
+  { hi: "व्यतीपात", en: "Vyatipata" },
+  { hi: "वरीयान्", en: "Variyan" },
+  { hi: "परिघ", en: "Parigha" },
+  { hi: "शिव", en: "Shiva" },
+  { hi: "सिद्ध", en: "Siddha" },
+  { hi: "साध्य", en: "Sadhya" },
+  { hi: "शुभ", en: "Shubha" },
+  { hi: "शुक्ल", en: "Shukla" },
+  { hi: "ब्रह्म", en: "Brahma" },
+  { hi: "इन्द्र", en: "Indra" },
+  { hi: "वैधृति", en: "Vaidhriti" }
 ];
 
 export const KARANA_NAMES = [
-  "बव (Bava)", "बालव (Balava)", "कौलव (Kaulava)", "तैतिल (Taitila)", 
-  "गर (Gara)", "वणिज (Vanija)", "विष्टि/भद्रा (Vishti/Bhadra)",
-  "शकुनि (Shakuni)", "चतुष्पाद (Chatushpada)", "नाग (Naga)", "किंस्तुघ्न (Kinstughna)"
+  { hi: "बव", en: "Bava" },
+  { hi: "बालव", en: "Balava" },
+  { hi: "कौलव", en: "Kaulava" },
+  { hi: "तैतिल", en: "Taitila" },
+  { hi: "गर", en: "Gara" },
+  { hi: "वणिज", en: "Vanija" },
+  { hi: "विष्टि/भद्रा", en: "Vishti / Bhadra" },
+  { hi: "शकुनि", en: "Shakuni" },
+  { hi: "चतुष्पाद", en: "Chatushpada" },
+  { hi: "नाग", en: "Naga" },
+  { hi: "किंस्तुघ्न", en: "Kinstughna" }
 ];
 
 export const MAJOR_FESTIVALS: FestivalInfo[] = [
-  { maas: "चैत्र (Chaitra)", isShukla: true, tithiNumber: 1, name: "Chaitra Navratri / Ugadi", hindiName: "चैत्र नवरात्रि / नव संवत्सर", icon: "🌸", description: "Vedic New Year & First day of Chaitra Navratri", colors: "from-amber-500 to-rose-600" },
-  { maas: "चैत्र (Chaitra)", isShukla: true, tithiNumber: 9, name: "Ram Navami", hindiName: "श्री राम नवमी", icon: "🏹", description: "Appearance day of Bhagwan Shri Rama", colors: "from-orange-500 to-amber-600" },
-  { maas: "चैत्र (Chaitra)", isShukla: true, tithiNumber: 15, name: "Hanuman Jayanti", hindiName: "हनुमान जन्मोत्सव", icon: "🚩", description: "Appearance day of Lord Hanuman", colors: "from-red-500 to-orange-600" },
-  { maas: "वैशाख (Vaisakha)", isShukla: true, tithiNumber: 3, name: "Akshaya Tritiya", hindiName: "अक्षय तृतीया", icon: "✨", description: "Day of eternal prosperity and auspicious beginnings", colors: "from-yellow-400 to-amber-600" },
-  { maas: "श्रावण (Shravana)", isShukla: true, tithiNumber: 15, name: "Raksha Bandhan", hindiName: "रक्षाबंधन / श्रावणी पूर्णिमा", icon: "🎀", description: "Sacred bond of protection and sibling love", colors: "from-pink-500 to-rose-600" },
-  { maas: "भाद्रपद (Bhadrapada)", isShukla: false, tithiNumber: 8, name: "Krishna Janmashtami", hindiName: "श्री कृष्ण जन्माष्टमी", icon: "🦚", description: "Appearance day of Bhagwan Shri Krishna at midnight", colors: "from-blue-600 to-indigo-800" },
-  { maas: "भाद्रपद (Bhadrapada)", isShukla: true, tithiNumber: 4, name: "Ganesh Chaturthi", hindiName: "श्री गणेश चतुर्थी", icon: "🐘", description: "Welcoming of Lord Ganesha, remover of obstacles", colors: "from-orange-500 to-red-600" },
-  { maas: "आश्विन (Ashwin)", isShukla: true, tithiNumber: 1, name: "Shardiya Navratri Ghatasthapana", hindiName: "शारदीय नवरात्रि आरम्भ", icon: "🔱", description: "Commencement of nine nights of Devi Durga worship", colors: "from-rose-500 to-purple-600" },
-  { maas: "आश्विन (Ashwin)", isShukla: true, tithiNumber: 10, name: "Vijayadashami (Dussehra)", hindiName: "विजयादशमी (दशहरा)", icon: "🏹", description: "Victory of good over evil", colors: "from-amber-500 to-orange-600" },
-  { maas: "कार्तिक (Kartika)", isShukla: false, tithiNumber: 13, name: "Dhanteras", hindiName: "धनतेरस / धन्वन्तरि जयन्ती", icon: "🏺", description: "Worship of Dhanvantari and Goddess Lakshmi", colors: "from-amber-400 to-yellow-600" },
-  { maas: "कार्तिक (Kartika)", isShukla: false, tithiNumber: 15, name: "Diwali (Deepavali)", hindiName: "दीपावली (लक्ष्मी पूजन)", icon: "🪔", description: "Grand Festival of Lights on Kartik Amavasya", colors: "from-yellow-500 to-orange-600" },
-  { maas: "कार्तिक (Kartika)", isShukla: true, tithiNumber: 11, name: "Devutthana Ekadashi", hindiName: "देवउठनी एकादशी / तुलसी विवाह", icon: "🌿", description: "Lord Vishnu awakens from cosmic slumber", colors: "from-emerald-500 to-teal-700" },
-  { maas: "पौष (Pausha)", isShukla: true, tithiNumber: 1, name: "Makar Sankranti", hindiName: "मकर संक्रान्ति (सूर्य उत्तरायण)", icon: "☀️", description: "Sun enters Makara (Capricorn), beginning Uttarayana", colors: "from-orange-400 to-amber-500" },
-  { maas: "माघ (Magha)", isShukla: true, tithiNumber: 5, name: "Vasant Panchami", hindiName: "वसन्त पंचमी (सरस्वती पूजा)", icon: "📚", description: "Advent of Spring and worship of Goddess Saraswati", colors: "from-yellow-300 to-amber-500" },
-  { maas: "फाल्गुन (Phalguna)", isShukla: false, tithiNumber: 14, name: "Maha Shivaratri", hindiName: "महाशिवरात्रि", icon: "🕉️", description: "The auspicious night of Lord Shiva and Shakti", colors: "from-indigo-600 to-purple-900" },
-  { maas: "फाल्गुन (Phalguna)", isShukla: true, tithiNumber: 15, name: "Holi / Holika Dahan", hindiName: "होली (होलिका दहन)", icon: "🎨", description: "Vibrant festival of colours and divine love", colors: "from-pink-500 to-violet-600" }
+  { maas: "चैत्र", isShukla: true, tithiNumber: 1, name: "Chaitra Navratri / Ugadi", hindiName: "चैत्र नवरात्रि / नव संवत्सर", icon: "🌸", description: "Vedic New Year & First day of Chaitra Navratri", colors: "from-amber-500 to-rose-600" },
+  { maas: "चैत्र", isShukla: true, tithiNumber: 9, name: "Ram Navami", hindiName: "श्री राम नवमी", icon: "🏹", description: "Appearance day of Bhagwan Shri Rama", colors: "from-orange-500 to-amber-600" },
+  { maas: "चैत्र", isShukla: true, tithiNumber: 15, name: "Hanuman Jayanti", hindiName: "हनुमान जन्मोत्सव", icon: "🚩", description: "Appearance day of Lord Hanuman", colors: "from-red-500 to-orange-600" },
+  { maas: "वैशाख", isShukla: true, tithiNumber: 3, name: "Akshaya Tritiya", hindiName: "अक्षय तृतीया", icon: "✨", description: "Day of eternal prosperity and auspicious beginnings", colors: "from-yellow-400 to-amber-600" },
+  { maas: "श्रावण", isShukla: true, tithiNumber: 15, name: "Raksha Bandhan", hindiName: "रक्षाबंधन / श्रावणी पूर्णिमा", icon: "🎀", description: "Sacred bond of protection and sibling love", colors: "from-pink-500 to-rose-600" },
+  { maas: "भाद्रपद", isShukla: false, tithiNumber: 8, name: "Krishna Janmashtami", hindiName: "श्री कृष्ण जन्माष्टमी", icon: "🦚", description: "Appearance day of Bhagwan Shri Krishna at midnight", colors: "from-blue-600 to-indigo-800" },
+  { maas: "भाद्रपद", isShukla: true, tithiNumber: 4, name: "Ganesh Chaturthi", hindiName: "श्री गणेश चतुर्थी", icon: "🐘", description: "Welcoming of Lord Ganesha, remover of obstacles", colors: "from-orange-500 to-red-600" },
+  { maas: "आश्विन", isShukla: true, tithiNumber: 1, name: "Shardiya Navratri Ghatasthapana", hindiName: "शारदीय नवरात्रि आरम्भ", icon: "🔱", description: "Commencement of nine nights of Devi Durga worship", colors: "from-rose-500 to-purple-600" },
+  { maas: "आश्विन", isShukla: true, tithiNumber: 10, name: "Vijayadashami (Dussehra)", hindiName: "विजयादशमी (दशहरा)", icon: "🏹", description: "Victory of good over evil", colors: "from-amber-500 to-orange-600" },
+  { maas: "कार्तिक", isShukla: false, tithiNumber: 13, name: "Dhanteras", hindiName: "धनतेरस / धन्वन्तरि जयन्ती", icon: "🏺", description: "Worship of Dhanvantari and Goddess Lakshmi", colors: "from-amber-400 to-yellow-600" },
+  { maas: "कार्तिक", isShukla: false, tithiNumber: 15, name: "Diwali (Deepavali)", hindiName: "दीपावली (लक्ष्मी पूजन)", icon: "🪔", description: "Grand Festival of Lights on Kartik Amavasya", colors: "from-yellow-500 to-orange-600" },
+  { maas: "कार्तिक", isShukla: true, tithiNumber: 11, name: "Devutthana Ekadashi", hindiName: "देवउठनी एकादशी / तुलसी विवाह", icon: "🌿", description: "Lord Vishnu awakens from cosmic slumber", colors: "from-emerald-500 to-teal-700" },
+  { maas: "पौष", isShukla: true, tithiNumber: 1, name: "Makar Sankranti", hindiName: "मकर संक्रान्ति (सूर्य उत्तरायण)", icon: "☀️", description: "Sun enters Makara (Capricorn), beginning Uttarayana", colors: "from-orange-400 to-amber-500" },
+  { maas: "माघ", isShukla: true, tithiNumber: 5, name: "Vasant Panchami", hindiName: "वसन्त पंचमी (सरस्वती पूजा)", icon: "📚", description: "Advent of Spring and worship of Goddess Saraswati", colors: "from-yellow-300 to-amber-500" },
+  { maas: "फाल्गुन", isShukla: false, tithiNumber: 14, name: "Maha Shivaratri", hindiName: "महाशिवरात्रि", icon: "🕉️", description: "The auspicious night of Lord Shiva and Shakti", colors: "from-indigo-600 to-purple-900" },
+  { maas: "फाल्गुन", isShukla: true, tithiNumber: 15, name: "Holi / Holika Dahan", hindiName: "होली (होलिका दहन)", icon: "🎨", description: "Vibrant festival of colours and divine love", colors: "from-pink-500 to-violet-600" }
 ];
 
 export function normalizeAngle(angle: number): number {
@@ -162,7 +234,8 @@ export function calculatePanchang(date: Date): PanchangData {
   const tithiProgressPercent = Math.round((tithiAngleRem / 12) * 100);
 
   const isShukla = tithiIndexRaw < 15;
-  const pakshaName = isShukla ? "शुक्ल पक्ष (Waxing / Shukla)" : "कृष्ण पक्ष (Waning / Krishna)";
+  const pakshaHi = isShukla ? "शुक्ल पक्ष" : "कृष्ण पक्ष";
+  const pakshaEn = isShukla ? "Waxing (Shukla)" : "Waning (Krishna)";
   const tithiNumber = (tithiIndexRaw % 15) + 1;
 
   // Nakshatra: 360 / 27 = 13.333333 degrees each
@@ -188,19 +261,19 @@ export function calculatePanchang(date: Date): PanchangData {
 
   // Karana: half of a tithi (6 degrees each)
   const karanaIndex = Math.floor(relativeAngle / 6) % 60;
-  let karanaName = "";
-  if (karanaIndex === 0) karanaName = KARANA_NAMES[10]; // Kimstughna
-  else if (karanaIndex >= 57) karanaName = KARANA_NAMES[7 + (karanaIndex - 57)]; // Shakuni, Chatushpada, Naga
-  else karanaName = KARANA_NAMES[(karanaIndex - 1) % 7];
+  let karanaObj = KARANA_NAMES[0];
+  if (karanaIndex === 0) karanaObj = KARANA_NAMES[10]; // Kimstughna
+  else if (karanaIndex >= 57) karanaObj = KARANA_NAMES[7 + (karanaIndex - 57)]; // Shakuni, Chatushpada, Naga
+  else karanaObj = KARANA_NAMES[(karanaIndex - 1) % 7];
 
-  const vikramSamvat = date.getFullYear() + 57;
+  const vikramSamvatYear = date.getFullYear() + 57;
 
-  const currentMaasName = MAAS_NAMES[maasIndex];
+  const currentMaas = MAAS_NAMES[maasIndex];
 
   // Detect active festival
   let matchedFestival: FestivalInfo | null = null;
   for (const fest of MAJOR_FESTIVALS) {
-    if (fest.maas === currentMaasName && fest.isShukla === isShukla && fest.tithiNumber === tithiNumber) {
+    if (fest.maas === currentMaas.hi && fest.isShukla === isShukla && fest.tithiNumber === tithiNumber) {
       matchedFestival = fest;
       break;
     }
@@ -216,31 +289,50 @@ export function calculatePanchang(date: Date): PanchangData {
     moonLatitude: parseFloat(moonLatitude.toFixed(2))
   };
 
+  const tithiData = TITHI_NAMES[tithiIndexRaw] || { hi: "प्रतिपदा", en: "Pratipada" };
+  const nakshatraData = NAKSHATRA_NAMES[nakshatraIndexRaw] || { name: "अश्विनी", nameEn: "Ashwini", lord: "केतु", lordEn: "Ketu" };
+  const vaarData = VAAR_NAMES[vaarIndexRaw] || { hi: "रविवार", en: "Sunday" };
+  const moonRashiData = RASHI_NAMES[moonRashiIndex] || { hi: "मेष", en: "Aries" };
+  const sunRashiData = RASHI_NAMES[sunRashiIndex] || { hi: "मेष", en: "Aries" };
+  const yogaData = YOGA_NAMES[yogaIndex] || { hi: "विष्कुम्भ", en: "Vishkumbha" };
+
   return {
     date,
     angles,
     tithi: {
       index: tithiIndexRaw,
-      name: TITHI_NAMES[tithiIndexRaw],
+      name: tithiData.hi,
+      nameEn: tithiData.en,
       number: tithiNumber,
-      paksha: isShukla ? 'शुक्ल पक्ष (Waxing / Shukla)' : 'कृष्ण पक्ष (Waning / Krishna)',
+      paksha: pakshaHi,
+      pakshaEn: pakshaEn,
       progressPercent: tithiProgressPercent
     },
-    paksha: pakshaName,
+    paksha: pakshaHi,
+    pakshaEn: pakshaEn,
     nakshatra: {
       index: nakshatraIndexRaw,
-      name: NAKSHATRA_NAMES[nakshatraIndexRaw]?.name || "अश्विनी",
-      lord: NAKSHATRA_NAMES[nakshatraIndexRaw]?.lord || "केतु",
+      name: nakshatraData.name,
+      nameEn: nakshatraData.nameEn,
+      lord: nakshatraData.lord,
+      lordEn: nakshatraData.lordEn,
       pada,
       degrees: siderealMoon
     },
-    maas: currentMaasName,
-    vaar: VAAR_NAMES[vaarIndexRaw],
-    samvatsar: `विक्रम संवत् ${vikramSamvat}`,
-    moonRashi: RASHI_NAMES[moonRashiIndex],
-    sunRashi: RASHI_NAMES[sunRashiIndex],
-    yoga: YOGA_NAMES[yogaIndex] || "विष्कुम्भ",
-    karana: karanaName,
+    maas: currentMaas.hi,
+    maasEn: currentMaas.en,
+    vaar: vaarData.hi,
+    vaarEn: vaarData.en,
+    samvatsar: `${vikramSamvatYear}`,
+    samvatsarEn: `${vikramSamvatYear}`,
+    moonRashi: moonRashiData.hi,
+    moonRashiEn: moonRashiData.en,
+    sunRashi: sunRashiData.hi,
+    sunRashiEn: sunRashiData.en,
+    yoga: yogaData.hi,
+    yogaEn: yogaData.en,
+    karana: karanaObj.hi,
+    karanaEn: karanaObj.en,
     activeFestival: matchedFestival
   };
 }

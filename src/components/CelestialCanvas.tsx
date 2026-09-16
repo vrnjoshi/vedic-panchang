@@ -2,6 +2,7 @@ import React, { useEffect, useRef } from 'react';
 import * as THREE from 'three';
 import { PanchangData } from '../types';
 import { VEDIC_NAKSHATRAS } from '../data/nakshatras';
+import { useLanguage } from '../context/LanguageContext';
 
 import earthTextureImg from '../assets/textures/earth.jpg';
 import earthCloudsImg from '../assets/textures/earth_clouds.png';
@@ -15,6 +16,7 @@ interface CelestialCanvasProps {
 }
 
 export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offsetDays = 0 }) => {
+  const { language } = useLanguage();
   const containerRef = useRef<HTMLDivElement>(null);
   const sceneRef = useRef<THREE.Scene | null>(null);
   const cameraRef = useRef<THREE.PerspectiveCamera | null>(null);
@@ -35,6 +37,14 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
   const tithiSectorRef = useRef<THREE.Mesh | null>(null);
   const nakshatraSpritesRef = useRef<THREE.Sprite[]>([]);
 
+  // Visual Sightline & Active Nakshatra Indicators
+  const sightlineBeamRef = useRef<THREE.Line | null>(null);
+  const activeSectorArcRef = useRef<THREE.Line | null>(null);
+  const activeSectorBoundariesRef = useRef<THREE.LineSegments | null>(null);
+  const activeNakshatraBeaconRef = useRef<THREE.Sprite | null>(null);
+  const activeNakshatraLabelRef = useRef<THREE.Sprite | null>(null);
+  const sightlineLabelRef = useRef<THREE.Sprite | null>(null);
+
   // Interaction state
   const isDraggingRef = useRef(false);
   const previousPointerPosRef = useRef({ x: 0, y: 0 });
@@ -44,6 +54,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
 
   const orbitRadiusSun = 15;
   const orbitRadiusMoon = 5.4;
+  const nakshatraRingRadius = orbitRadiusSun + 2.8;
 
   // NASA SDO Fiery Solar Corona Halo Gradient
   const createSunGlowTexture = () => {
@@ -65,7 +76,121 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     return new THREE.CanvasTexture(canvas);
   };
 
-  // Vedic Nakshatra Badge with high-DPI rendering and iOS Emoji compatibility
+  // Pulsing Target Beacon Halo for Active Nakshatra
+  const createActiveBeaconTexture = () => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 256;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, 256, 256);
+
+    // Glowing target circle
+    const grad = ctx.createRadialGradient(128, 128, 10, 128, 128, 120);
+    grad.addColorStop(0, 'rgba(251, 191, 36, 0.85)');
+    grad.addColorStop(0.4, 'rgba(245, 158, 11, 0.45)');
+    grad.addColorStop(0.8, 'rgba(217, 119, 6, 0.15)');
+    grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(128, 128, 120, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Outer ring
+    ctx.strokeStyle = '#fef08a';
+    ctx.lineWidth = 6;
+    ctx.beginPath();
+    ctx.arc(128, 128, 112, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Crosshairs
+    ctx.strokeStyle = 'rgba(254, 240, 138, 0.8)';
+    ctx.lineWidth = 4;
+    ctx.beginPath();
+    ctx.moveTo(128, 8);
+    ctx.lineTo(128, 248);
+    ctx.moveTo(8, 128);
+    ctx.lineTo(248, 128);
+    ctx.stroke();
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  };
+
+  // 3D Floating Badge Label explicitly marking "CURRENT NAKSHATRA / वर्तमान नक्षत्र"
+  const createActiveLabelTexture = (lang: 'hi' | 'en', name: string, num: number) => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 512;
+    canvas.height = 140;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, 512, 140);
+
+    // Rounded background pill
+    const rx = 16, ry = 16, rw = 480, rh = 108, radius = 28;
+    ctx.fillStyle = 'rgba(15, 23, 42, 0.95)';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(rx, ry, rw, rh, radius) : ctx.rect(rx, ry, rw, rh);
+    ctx.fill();
+
+    // High-visibility golden border
+    ctx.strokeStyle = '#fbbf24';
+    ctx.lineWidth = 6;
+    ctx.stroke();
+
+    // Pulsing indicator dot
+    ctx.fillStyle = '#f59e0b';
+    ctx.beginPath();
+    ctx.arc(60, 70, 14, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#ffffff';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Title line: "CURRENT NAKSHATRA" or "वर्तमान सक्रिय नक्षत्र"
+    ctx.font = 'bold 30px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillStyle = '#fbbf24';
+    ctx.textAlign = 'left';
+    ctx.fillText(lang === 'hi' ? 'वर्तमान सक्रिय नक्षत्र' : 'CURRENT NAKSHATRA', 92, 54);
+
+    // Subtitle line: "#{num}. {Name}"
+    ctx.font = 'bold 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillStyle = '#ffffff';
+    ctx.fillText(`#${num}. ${name}`, 92, 98);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  };
+
+  // 3D Floating Label along the Earth -> Moon sightline
+  const createSightlineLabelTexture = (lang: 'hi' | 'en') => {
+    const canvas = document.createElement('canvas');
+    canvas.width = 440;
+    canvas.height = 80;
+    const ctx = canvas.getContext('2d')!;
+    ctx.clearRect(0, 0, 440, 80);
+
+    // Soft pill
+    ctx.fillStyle = 'rgba(2, 6, 23, 0.88)';
+    ctx.beginPath();
+    ctx.roundRect ? ctx.roundRect(10, 10, 420, 60, 20) : ctx.rect(10, 10, 420, 60);
+    ctx.fill();
+    ctx.strokeStyle = 'rgba(56, 189, 248, 0.7)';
+    ctx.lineWidth = 3;
+    ctx.stroke();
+
+    // Text: "Earth ➔ Moon Sightline"
+    ctx.font = 'bold 24px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
+    ctx.fillStyle = '#38bdf8';
+    ctx.textAlign = 'center';
+    ctx.fillText(lang === 'hi' ? 'दृष्टि रेखा (पृथ्वी ➔ चन्द्र ➔ नक्षत्र)' : 'Lunar Sightline (Earth ➔ Moon)', 220, 48);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    texture.needsUpdate = true;
+    return texture;
+  };
+
+  // Vedic Nakshatra Badge Texture
   const createNakshatraBadgeTexture = (
     index: number,
     emoji: string,
@@ -78,7 +203,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const ctx = canvas.getContext('2d')!;
     ctx.clearRect(0, 0, 512, 512);
 
-    // Deep cosmic gradient background with rich opacity (guarantees solid backdrop)
+    // Deep cosmic gradient background
     const bgGrad = ctx.createRadialGradient(256, 256, 40, 256, 256, 240);
     bgGrad.addColorStop(0, 'rgba(26, 22, 68, 0.98)');
     bgGrad.addColorStop(0.7, 'rgba(15, 23, 42, 0.96)');
@@ -89,7 +214,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.arc(256, 256, 240, 0, Math.PI * 2);
     ctx.fill();
 
-    // Outer golden boundary ring with rich contrast
+    // Outer golden boundary ring
     ctx.strokeStyle = '#fbbf24';
     ctx.lineWidth = 10;
     ctx.beginPath();
@@ -103,8 +228,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.arc(256, 256, 222, 0, Math.PI * 2);
     ctx.stroke();
 
-    // Dedicated illuminated circular backdrop disc specifically behind the Nakshatra symbol
-    // Ensures symbols are vibrantly visible and never blend with dark canvas backgrounds
+    // Illuminated circular backdrop disc behind symbol
     const iconDiscGrad = ctx.createRadialGradient(256, 172, 10, 256, 172, 115);
     iconDiscGrad.addColorStop(0, 'rgba(255, 255, 255, 0.45)');
     iconDiscGrad.addColorStop(0.5, 'rgba(251, 191, 36, 0.3)');
@@ -115,13 +239,8 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.arc(256, 172, 115, 0, Math.PI * 2);
     ctx.fill();
 
-    // Ensure Unicode Emoji Presentation Selector (\uFE0F) is present
-    // This tells iOS Safari / WebKit and Android to render standard colorful graphical emoji instead of monochrome text glyphs
     const formattedEmoji = emoji.includes('\uFE0F') ? emoji : `${emoji}\uFE0F`;
 
-    // CRITICAL iOS / iPhone Safari Centering & Contrast Fix:
-    // 1. Explicitly set textBaseline to 'alphabetic' and compute vertical ascent/descent for mathematical vertical centering.
-    // 2. High contrast emoji rendering with crisp backdrop.
     ctx.save();
     ctx.font = '135px "Apple Color Emoji", "Segoe UI Emoji", "Noto Color Emoji", sans-serif';
     ctx.textAlign = 'center';
@@ -130,7 +249,6 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.shadowColor = 'rgba(0, 0, 0, 0.95)';
     ctx.shadowBlur = 14;
 
-    // Measure metrics for exact vertical centering across iOS Safari and Chromium
     const emojiMetrics = ctx.measureText(formattedEmoji);
     const emojiAscent = emojiMetrics.actualBoundingBoxAscent || 95;
     const emojiDescent = emojiMetrics.actualBoundingBoxDescent || 25;
@@ -138,7 +256,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.fillText(formattedEmoji, 256, emojiCenterY);
     ctx.restore();
 
-    // Sacred Devanagari Hindi Name (Clean, crisp, high-contrast gold)
+    // Devanagari Hindi Name
     ctx.save();
     ctx.font = 'bold 54px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.fillStyle = '#fef08a';
@@ -153,7 +271,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     ctx.fillText(hindiName, 256, hindiCenterY);
     ctx.restore();
 
-    // English Name & Lunar Mansion Number (High-contrast bright white with clean shadow)
+    // English Name & Lunar Mansion Number
     ctx.save();
     ctx.font = '700 36px -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif';
     ctx.fillStyle = '#ffffff';
@@ -179,7 +297,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
 
   const createNakshatraRing = () => {
     const group = new THREE.Group();
-    const radius = orbitRadiusSun + 2.8;
+    const radius = nakshatraRingRadius;
 
     const circleGeo = new THREE.BufferGeometry();
     const points: THREE.Vector3[] = [];
@@ -293,14 +411,12 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     renderer.setSize(width, height);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Deep cosmic space background
     renderer.setClearColor(0x060913, 1);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
     renderer.toneMappingExposure = 1.3;
     containerRef.current.replaceChildren(renderer.domElement);
     rendererRef.current = renderer;
 
-    // Load authentic NASA satellite textures
     const textureLoader = new THREE.TextureLoader();
 
     const earthTexture = textureLoader.load(earthTextureImg);
@@ -317,7 +433,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const moonTexture = textureLoader.load(moonTextureImg);
     moonTexture.colorSpace = THREE.SRGBColorSpace;
 
-    // Gentle ambient light so dark sides maintain subtle form
+    // Ambient light
     const ambientLight = new THREE.AmbientLight(0x334155, 0.45);
     scene.add(ambientLight);
 
@@ -327,11 +443,9 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     scene.add(dirSunLight);
     sunlightRef.current = dirSunLight;
 
-    // ==========================================
-    // 1. AUTHENTIC NASA EARTH (Blue Marble)
-    // ==========================================
+    // 1. Earth
     const earthTiltGroup = new THREE.Group();
-    earthTiltGroup.rotation.z = (23.44 * Math.PI) / 180; // Authentic axial tilt (23.44°)
+    earthTiltGroup.rotation.z = (23.44 * Math.PI) / 180;
     scene.add(earthTiltGroup);
     earthTiltGroupRef.current = earthTiltGroup;
 
@@ -345,7 +459,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     earthTiltGroup.add(earthMesh);
     earthMeshRef.current = earthMesh;
 
-    // Authentic Cloud Layer
+    // Cloud Layer
     const cloudGeo = new THREE.SphereGeometry(1.63, 64, 64);
     const cloudMat = new THREE.MeshStandardMaterial({
       map: earthCloudsTexture,
@@ -358,7 +472,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     earthMesh.add(cloudMesh);
     earthCloudsRef.current = cloudMesh;
 
-    // Delicate Blue Atmospheric Glow
+    // Atmospheric Glow
     const atmosphereGeo = new THREE.SphereGeometry(1.72, 48, 48);
     const atmosphereMat = new THREE.MeshBasicMaterial({
       color: 0x38bdf8,
@@ -371,28 +485,21 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const atmosphere = new THREE.Mesh(atmosphereGeo, atmosphereMat);
     earthMesh.add(atmosphere);
 
-    // ==========================================
-    // 2. NASA SDO 304 Å FIERY SUN & CORONA
-    // ==========================================
+    // 2. Sun
     const sunGroup = new THREE.Group();
     scene.add(sunGroup);
     sunGroupRef.current = sunGroup;
 
-    // 2a. Spherical Fiery Photosphere
     const sunGeo = new THREE.SphereGeometry(2.2, 64, 64);
-    const sunMat = new THREE.MeshBasicMaterial({
-      map: sunTexture,
-    });
+    const sunMat = new THREE.MeshBasicMaterial({ map: sunTexture });
     const sunMesh = new THREE.Mesh(sunGeo, sunMat);
     sunGroup.add(sunMesh);
     sunMeshRef.current = sunMesh;
 
-    // 2b. Omnidirectional Sun Light
     const sunPointLight = new THREE.PointLight(0xffedd5, 3.4, 250, 0.45);
     sunGroup.add(sunPointLight);
     sunPointLightRef.current = sunPointLight;
 
-    // 2c. Primary Coronal Prominence Flare Sprite (NASA SDO Leap Prominences)
     const promMat1 = new THREE.SpriteMaterial({
       map: sunProminencesTexture,
       color: 0xffffff,
@@ -406,7 +513,6 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     sunGroup.add(promSprite1);
     sunProminence1Ref.current = promSprite1;
 
-    // 2d. Secondary Animated Coronal Plasma Layer (creates churning flame dynamics)
     const promMat2 = new THREE.SpriteMaterial({
       map: sunProminencesTexture,
       color: 0xffaa44,
@@ -421,7 +527,6 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     sunGroup.add(promSprite2);
     sunProminence2Ref.current = promSprite2;
 
-    // 2e. Radiant Fiery Solar Atmospheric Corona Glow
     const sunGlowMat = new THREE.SpriteMaterial({
       map: createSunGlowTexture(),
       color: 0xffffff,
@@ -435,9 +540,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     sunGroup.add(sunGlow);
     sunGlowRef.current = sunGlow;
 
-    // ==========================================
-    // 3. AUTHENTIC NASA LUNAR SURFACE
-    // ==========================================
+    // 3. Moon
     const moonGeo = new THREE.SphereGeometry(0.65, 48, 48);
     const moonMat = new THREE.MeshStandardMaterial({
       map: moonTexture,
@@ -463,13 +566,90 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     scene.add(tithiMesh);
     tithiSectorRef.current = tithiMesh;
 
+    // =========================================================
+    // 4. LUNAR SIGHTLINE RAY (Earth -> Moon -> Nakshatra)
+    // =========================================================
+    const sightlineGeo = new THREE.BufferGeometry();
+    const sightlineMat = new THREE.LineDashedMaterial({
+      color: 0x38bdf8,
+      dashSize: 0.5,
+      gapSize: 0.2,
+      transparent: true,
+      opacity: 0.95,
+      linewidth: 2,
+    });
+    const sightlineBeam = new THREE.Line(sightlineGeo, sightlineMat);
+    scene.add(sightlineBeam);
+    sightlineBeamRef.current = sightlineBeam;
+
+    // Active Sector Arc (Illuminated 13°20' arc along the Nakshatra ring)
+    const arcGeo = new THREE.BufferGeometry();
+    const arcMat = new THREE.LineBasicMaterial({
+      color: 0xfbbf24,
+      linewidth: 3,
+      transparent: true,
+      opacity: 0.95,
+    });
+    const activeArc = new THREE.Line(arcGeo, arcMat);
+    scene.add(activeArc);
+    activeSectorArcRef.current = activeArc;
+
+    // Active Sector Boundaries (Lines radiating from origin to 13°20' boundaries)
+    const boundGeo = new THREE.BufferGeometry();
+    const boundMat = new THREE.LineBasicMaterial({
+      color: 0xf59e0b,
+      transparent: true,
+      opacity: 0.45,
+    });
+    const activeBoundaries = new THREE.LineSegments(boundGeo, boundMat);
+    scene.add(activeBoundaries);
+    activeSectorBoundariesRef.current = activeBoundaries;
+
+    // Active Nakshatra Pulsing Target Beacon Halo
+    const beaconMat = new THREE.SpriteMaterial({
+      map: createActiveBeaconTexture(),
+      color: 0xffffff,
+      transparent: true,
+      opacity: 0.95,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    });
+    const beaconSprite = new THREE.Sprite(beaconMat);
+    beaconSprite.scale.set(4.2, 4.2, 1);
+    scene.add(beaconSprite);
+    activeNakshatraBeaconRef.current = beaconSprite;
+
+    // Floating Label Sprite for "CURRENT NAKSHATRA"
+    const labelMat = new THREE.SpriteMaterial({
+      map: createActiveLabelTexture(language, panchang.nakshatra.name, panchang.nakshatra.index + 1),
+      transparent: true,
+      opacity: 0.98,
+      depthWrite: false,
+    });
+    const labelSprite = new THREE.Sprite(labelMat);
+    labelSprite.scale.set(4.2, 1.15, 1);
+    scene.add(labelSprite);
+    activeNakshatraLabelRef.current = labelSprite;
+
+    // Floating Sightline Label Sprite
+    const sightLabelMat = new THREE.SpriteMaterial({
+      map: createSightlineLabelTexture(language),
+      transparent: true,
+      opacity: 0.85,
+      depthWrite: false,
+    });
+    const sightLabelSprite = new THREE.Sprite(sightLabelMat);
+    sightLabelSprite.scale.set(3.4, 0.65, 1);
+    scene.add(sightLabelSprite);
+    sightlineLabelRef.current = sightLabelSprite;
+
     // Nakshatra Ring
     scene.add(createNakshatraRing());
 
     // Orbit paths
     scene.add(createOrbitPaths());
 
-    // Starfield (2,500 distant celestial stars)
+    // Starfield
     const starCount = 2500;
     const starGeo = new THREE.BufferGeometry();
     const starPositions = new Float32Array(starCount * 3);
@@ -507,7 +687,7 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     });
     scene.add(new THREE.Points(starGeo, starMat));
 
-    // Mouse & Touch Controls
+    // Pointer controls
     const domEl = renderer.domElement;
 
     const onPointerDown = (clientX: number, clientY: number) => {
@@ -522,18 +702,14 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
       const deltaY = clientY - previousPointerPosRef.current.y;
       previousPointerPosRef.current = { x: clientX, y: clientY };
 
-      const factor = 0.005;
-      targetSceneRotationRef.current.y += deltaX * factor;
-      targetSceneRotationRef.current.x += deltaY * factor;
-      targetSceneRotationRef.current.x = Math.max(
-        -Math.PI / 2.2,
-        Math.min(Math.PI / 2.2, targetSceneRotationRef.current.x)
-      );
-
       rotationVelocityRef.current = {
-        x: deltaY * factor * 0.4,
-        y: deltaX * factor * 0.4,
+        x: deltaY * 0.004,
+        y: deltaX * 0.004,
       };
+
+      targetSceneRotationRef.current.y += deltaX * 0.006;
+      targetSceneRotationRef.current.x += deltaY * 0.006;
+      targetSceneRotationRef.current.x = Math.max(-Math.PI / 2.3, Math.min(Math.PI / 2.3, targetSceneRotationRef.current.x));
     };
 
     const onPointerUp = () => {
@@ -544,53 +720,47 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const handleMouseMove = (e: MouseEvent) => onPointerMove(e.clientX, e.clientY);
     const handleMouseUp = () => onPointerUp();
 
-    let pinchStartDistance: number | null = null;
-    let initialPinchCameraDist: number = 26;
-
+    let initialPinchDist = 0;
     const handleTouchStart = (e: TouchEvent) => {
       if (e.touches.length === 1) {
-        pinchStartDistance = null;
         onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
       } else if (e.touches.length === 2) {
-        // Pinch-to-zoom start
         isDraggingRef.current = false;
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        pinchStartDistance = Math.hypot(dx, dy);
-        initialPinchCameraDist = targetCameraPosRef.current.length();
+        initialPinchDist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
       }
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1 && !pinchStartDistance) {
+      if (e.touches.length === 1) {
         onPointerMove(e.touches[0].clientX, e.touches[0].clientY);
-      } else if (e.touches.length === 2 && pinchStartDistance) {
-        const dx = e.touches[0].clientX - e.touches[1].clientX;
-        const dy = e.touches[0].clientY - e.touches[1].clientY;
-        const currentDistance = Math.hypot(dx, dy);
-        const scaleFactor = pinchStartDistance / currentDistance;
-        const newDist = Math.max(10, Math.min(55, initialPinchCameraDist * scaleFactor));
-        targetCameraPosRef.current.normalize().multiplyScalar(newDist);
+      } else if (e.touches.length === 2 && initialPinchDist > 0) {
+        const dist = Math.hypot(
+          e.touches[0].clientX - e.touches[1].clientX,
+          e.touches[0].clientY - e.touches[1].clientY
+        );
+        const delta = (initialPinchDist - dist) * 0.08;
+        initialPinchDist = dist;
+
+        const currentDist = targetCameraPosRef.current.length();
+        const newDist = Math.max(14, Math.min(55, currentDist + delta));
+        targetCameraPosRef.current.setLength(newDist);
       }
     };
 
-    const handleTouchEnd = (e: TouchEvent) => {
-      if (e.touches.length === 0) {
-        pinchStartDistance = null;
-        onPointerUp();
-      } else if (e.touches.length === 1) {
-        pinchStartDistance = null;
-        onPointerDown(e.touches[0].clientX, e.touches[0].clientY);
-      }
+    const handleTouchEnd = () => {
+      onPointerUp();
+      initialPinchDist = 0;
     };
 
     const handleWheel = (e: WheelEvent) => {
       e.preventDefault();
       const zoomFactor = e.deltaY * 0.025;
-      const newDistance = targetCameraPosRef.current.length() + zoomFactor;
-      if (newDistance >= 10 && newDistance <= 55) {
-        targetCameraPosRef.current.normalize().multiplyScalar(newDistance);
-      }
+      const currentDist = targetCameraPosRef.current.length();
+      const newDist = Math.max(14, Math.min(55, currentDist + zoomFactor));
+      targetCameraPosRef.current.setLength(newDist);
     };
 
     domEl.addEventListener('mousedown', handleMouseDown);
@@ -619,20 +789,12 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
       scene.rotation.y += (targetSceneRotationRef.current.y - scene.rotation.y) * 0.1;
       scene.rotation.x += (targetSceneRotationRef.current.x - scene.rotation.x) * 0.1;
 
-      // Subtle natural celestial rotations
       if (earthMeshRef.current) earthMeshRef.current.rotation.y += 0.0008;
       if (earthCloudsRef.current) earthCloudsRef.current.rotation.y += 0.0012;
-      // (Note: Moon axial rotation is tidally locked to Earth and updated with orbit)
 
-      // ==========================================
-      // DYNAMIC FIERY SOLAR ANIMATION (Like SDO)
-      // ==========================================
-      // Photosphere axial rotation
-      if (sunMeshRef.current) {
-        sunMeshRef.current.rotation.y += 0.0014;
-      }
+      // Dynamic solar animation
+      if (sunMeshRef.current) sunMeshRef.current.rotation.y += 0.0014;
 
-      // Primary leaping solar prominence flares (breathing & slow rotation)
       if (sunProminence1Ref.current) {
         sunProminence1Ref.current.material.rotation += 0.00045;
         const pulse1 = 4.8 + Math.sin(time * 2.1) * 0.11 + Math.cos(time * 3.8) * 0.05;
@@ -640,7 +802,6 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
         sunProminence1Ref.current.material.opacity = 0.9 + Math.sin(time * 1.7) * 0.08;
       }
 
-      // Secondary counter-rotating coronal plasma layer (creates churning solar prominence loop effect)
       if (sunProminence2Ref.current) {
         sunProminence2Ref.current.material.rotation -= 0.00035;
         const pulse2 = 5.0 + Math.cos(time * 1.9) * 0.14 + Math.sin(time * 3.1) * 0.06;
@@ -648,15 +809,21 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
         sunProminence2Ref.current.material.opacity = 0.62 + Math.cos(time * 2.3) * 0.1;
       }
 
-      // Radiant atmospheric aura breathing
       if (sunGlowRef.current) {
         const auraPulse = 8.8 + Math.sin(time * 1.4) * 0.35;
         sunGlowRef.current.scale.set(auraPulse, auraPulse, 1);
       }
 
-      // Subtle solar radiance light pulsation
       if (sunPointLightRef.current) {
         sunPointLightRef.current.intensity = 3.4 + Math.sin(time * 2.4) * 0.25;
+      }
+
+      // Active Nakshatra Beacon Pulsing Animation
+      if (activeNakshatraBeaconRef.current) {
+        const beaconScale = 4.0 + Math.sin(time * 3.5) * 0.45;
+        activeNakshatraBeaconRef.current.scale.set(beaconScale, beaconScale, 1);
+        activeNakshatraBeaconRef.current.material.opacity = 0.75 + Math.sin(time * 3.5) * 0.25;
+        activeNakshatraBeaconRef.current.material.rotation += 0.005;
       }
 
       if (cameraRef.current) {
@@ -696,12 +863,13 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     };
   }, []);
 
-  // Update Sun & Moon 3D coordinates, Tidal Locking, Earth Rotation & Tithi Sector
+  // Update Sun & Moon coordinates, Geocentric Lunar Sightline, Active Nakshatra Highlight & Sector
   useEffect(() => {
     if (!sunGroupRef.current || !moonMeshRef.current || !tithiSectorRef.current) return;
 
-    const sunLon = panchang.angles.sunTropical;
-    const moonLon = panchang.angles.moonTropical;
+    // Use Sidereal coordinates so the Moon aligns with the fixed Nakshatra star ring!
+    const sunLon = panchang.angles.sunSidereal;
+    const moonLon = panchang.angles.moonSidereal;
     const relAngle = panchang.angles.relative;
 
     const sunRad = (sunLon * Math.PI) / 180;
@@ -723,14 +891,10 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     const moonZ = -Math.sin(moonRad) * orbitRadiusMoon;
     moonMeshRef.current.position.set(moonX, 0, moonZ);
 
-    // AUTHENTIC TIDAL LOCKING PHYSICS:
-    // The Moon's orbital period matches its axial rotation period exactly (1:1 resonance).
-    // The same lunar hemisphere (Near Side) continuously faces the Earth center (0, 0, 0).
-    // As the Moon revolves around Earth, lookAt(0, 0, 0) dynamically turns the Moon on its polar axis!
+    // Authentic Tidal Locking Physics (Near Side faces Earth)
     moonMeshRef.current.lookAt(0, 0, 0);
 
-    // AUTHENTIC EARTH DIURNAL AXIAL ROTATION:
-    // Earth completes exactly 1 full rotation (360° / 2π rad) per 24-hour solar day.
+    // Diurnal axial rotation of Earth
     if (earthMeshRef.current) {
       const earthAngle = ((offsetDays || 0) * Math.PI * 2) % (Math.PI * 2);
       earthMeshRef.current.rotation.y = earthAngle;
@@ -740,20 +904,105 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
       earthCloudsRef.current.rotation.y = cloudAngle;
     }
 
-    // Active Nakshatra Highlighting:
-    // Enlarge the sprite representing the currently occupied Nakshatra
+    // =========================================================================
+    // GEOCENTRIC LUNAR SIGHTLINE: Earth (0,0,0) -> Moon -> Outer Celestial Ring
+    // =========================================================================
+    const sightDist = nakshatraRingRadius + 4.2;
+    const sightX = Math.cos(moonRad) * sightDist;
+    const sightZ = -Math.sin(moonRad) * sightDist;
+
+    if (sightlineBeamRef.current) {
+      const sightPoints = [
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(moonX, 0, moonZ),
+        new THREE.Vector3(sightX, 0, sightZ),
+      ];
+      sightlineBeamRef.current.geometry.dispose();
+      const sGeo = new THREE.BufferGeometry().setFromPoints(sightPoints);
+      sightlineBeamRef.current.geometry = sGeo;
+      sightlineBeamRef.current.computeLineDistances();
+    }
+
+    // Position Sightline label halfway between Moon and Nakshatra
+    if (sightlineLabelRef.current) {
+      const labelDist = orbitRadiusMoon + 5.2;
+      const lx = Math.cos(moonRad) * labelDist;
+      const lz = -Math.sin(moonRad) * labelDist;
+      sightlineLabelRef.current.position.set(lx, 1.4, lz);
+      sightlineLabelRef.current.material.map = createSightlineLabelTexture(language);
+      sightlineLabelRef.current.material.needsUpdate = true;
+    }
+
+    // =========================================================================
+    // ACTIVE NAKSHATRA 13°20' ARC & BOUNDARY RAYS
+    // =========================================================================
+    const activeIdx = panchang.nakshatra.index;
+    const nakshatraDegrees = 360 / 27;
+    const startDeg = activeIdx * nakshatraDegrees;
+    const endDeg = (activeIdx + 1) * nakshatraDegrees;
+    const midDeg = startDeg + nakshatraDegrees / 2;
+    const midRad = (midDeg * Math.PI) / 180;
+
+    // Highlighted Arc along the outer ring
+    if (activeSectorArcRef.current) {
+      const arcPoints: THREE.Vector3[] = [];
+      const arcSegments = 24;
+      for (let s = 0; s <= arcSegments; s++) {
+        const deg = startDeg + (s / arcSegments) * nakshatraDegrees;
+        const r = (deg * Math.PI) / 180;
+        arcPoints.push(new THREE.Vector3(Math.cos(r) * (nakshatraRingRadius + 0.1), 0.2, -Math.sin(r) * (nakshatraRingRadius + 0.1)));
+      }
+      activeSectorArcRef.current.geometry.dispose();
+      activeSectorArcRef.current.geometry = new THREE.BufferGeometry().setFromPoints(arcPoints);
+    }
+
+    // Boundary rays from Earth to the 13°20' limits
+    if (activeSectorBoundariesRef.current) {
+      const r1 = (startDeg * Math.PI) / 180;
+      const r2 = (endDeg * Math.PI) / 180;
+      const boundPoints = [
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(Math.cos(r1) * (nakshatraRingRadius + 2.2), 0, -Math.sin(r1) * (nakshatraRingRadius + 2.2)),
+        new THREE.Vector3(0, 0, 0),
+        new THREE.Vector3(Math.cos(r2) * (nakshatraRingRadius + 2.2), 0, -Math.sin(r2) * (nakshatraRingRadius + 2.2)),
+      ];
+      activeSectorBoundariesRef.current.geometry.dispose();
+      activeSectorBoundariesRef.current.geometry = new THREE.BufferGeometry().setFromPoints(boundPoints);
+    }
+
+    // =========================================================================
+    // ACTIVE NAKSHATRA TARGET BEACON & 3D LABEL
+    // =========================================================================
+    const badgeR = nakshatraRingRadius + 2.0;
+    const badgeX = Math.cos(midRad) * badgeR;
+    const badgeZ = -Math.sin(midRad) * badgeR;
+
+    if (activeNakshatraBeaconRef.current) {
+      activeNakshatraBeaconRef.current.position.set(badgeX, 0.3, badgeZ);
+    }
+
+    if (activeNakshatraLabelRef.current) {
+      activeNakshatraLabelRef.current.position.set(badgeX, 2.7, badgeZ);
+      const nakshatraDisplayName = language === 'hi' ? panchang.nakshatra.name : panchang.nakshatra.nameEn;
+      activeNakshatraLabelRef.current.material.map = createActiveLabelTexture(language, nakshatraDisplayName, activeIdx + 1);
+      activeNakshatraLabelRef.current.material.needsUpdate = true;
+    }
+
+    // Active Nakshatra Highlighting on Sprites:
+    // Noticeable scale and full opacity for active nakshatra
     if (nakshatraSpritesRef.current.length === 27) {
       nakshatraSpritesRef.current.forEach((sprite, idx) => {
-        if (idx === panchang.nakshatra.index) {
-          sprite.scale.set(3.0, 3.0, 1);
+        if (idx === activeIdx) {
+          sprite.scale.set(3.4, 3.4, 1);
           sprite.material.opacity = 1.0;
         } else {
-          sprite.scale.set(2.2, 2.2, 1);
-          sprite.material.opacity = 0.88;
+          sprite.scale.set(2.0, 2.0, 1);
+          sprite.material.opacity = 0.72;
         }
       });
     }
 
+    // Tithi Sector Mesh (Relative elongation wedge between Sun and Moon)
     const segments = 64;
     const relAngleRad = (relAngle * Math.PI) / 180;
     const vertices: number[] = [];
@@ -778,14 +1027,36 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
     newGeo.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
     newGeo.computeVertexNormals();
     tithiSectorRef.current.geometry = newGeo;
-  }, [panchang, offsetDays]);
+  }, [panchang, offsetDays, language]);
 
   return (
-    <div
-      ref={containerRef}
-      id="canvas-container"
-      className="absolute inset-0 w-full h-full cursor-grab active:cursor-grabbing select-none"
-      style={{ touchAction: 'none' }}
-    />
+    <div className="absolute inset-0 w-full h-full overflow-hidden">
+      <div
+        ref={containerRef}
+        id="canvas-container"
+        className="w-full h-full cursor-grab active:cursor-grabbing select-none"
+        style={{ touchAction: 'none' }}
+      />
+
+      {/* Floating Visual Key: Explains how Current Nakshatra is determined by the Earth -> Moon sightline */}
+      <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-10 w-[95%] max-w-xl text-center px-2">
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-xs shadow-xl text-slate-200">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 animate-ping" />
+          <span className="truncate">
+            {language === 'hi' ? (
+              <>
+                <strong className="text-cyan-300">चन्द्र दृष्टि रेखा:</strong> पृथ्वी से चन्द्रमा की सीध में देखने पर चन्द्रमा{' '}
+                <strong className="text-amber-300">{panchang.nakshatra.name}</strong> ({panchang.nakshatra.index + 1}वां, 13°20' क्षेत्र) के सम्मुख स्थित है।
+              </>
+            ) : (
+              <>
+                <strong className="text-cyan-300">Lunar Sightline:</strong> Looking from Earth through the Moon aligns with{' '}
+                <strong className="text-amber-300">{panchang.nakshatra.nameEn}</strong> (Nakshatra #{panchang.nakshatra.index + 1}, 13°20' sector).
+              </>
+            )}
+          </span>
+        </div>
+      </div>
+    </div>
   );
 };
