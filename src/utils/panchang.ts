@@ -147,24 +147,96 @@ export const KARANA_NAMES = [
   { hi: "किंस्तुघ्न", en: "Kinstughna" }
 ];
 
-export const MAJOR_FESTIVALS: FestivalInfo[] = [
-  { maas: "चैत्र", isShukla: true, tithiNumber: 1, name: "Chaitra Navratri / Ugadi", hindiName: "चैत्र नवरात्रि / नव संवत्सर", icon: "🌸", description: "Vedic New Year & First day of Chaitra Navratri", colors: "from-amber-500 to-rose-600" },
-  { maas: "चैत्र", isShukla: true, tithiNumber: 9, name: "Ram Navami", hindiName: "श्री राम नवमी", icon: "🏹", description: "Appearance day of Bhagwan Shri Rama", colors: "from-orange-500 to-amber-600" },
-  { maas: "चैत्र", isShukla: true, tithiNumber: 15, name: "Hanuman Jayanti", hindiName: "हनुमान जन्मोत्सव", icon: "🚩", description: "Appearance day of Lord Hanuman", colors: "from-red-500 to-orange-600" },
-  { maas: "वैशाख", isShukla: true, tithiNumber: 3, name: "Akshaya Tritiya", hindiName: "अक्षय तृतीया", icon: "✨", description: "Day of eternal prosperity and auspicious beginnings", colors: "from-yellow-400 to-amber-600" },
-  { maas: "श्रावण", isShukla: true, tithiNumber: 15, name: "Raksha Bandhan", hindiName: "रक्षाबंधन / श्रावणी पूर्णिमा", icon: "🎀", description: "Sacred bond of protection and sibling love", colors: "from-pink-500 to-rose-600" },
-  { maas: "भाद्रपद", isShukla: false, tithiNumber: 8, name: "Krishna Janmashtami", hindiName: "श्री कृष्ण जन्माष्टमी", icon: "🦚", description: "Appearance day of Bhagwan Shri Krishna at midnight", colors: "from-blue-600 to-indigo-800" },
-  { maas: "भाद्रपद", isShukla: true, tithiNumber: 4, name: "Ganesh Chaturthi", hindiName: "श्री गणेश चतुर्थी", icon: "🐘", description: "Welcoming of Lord Ganesha, remover of obstacles", colors: "from-orange-500 to-red-600" },
-  { maas: "आश्विन", isShukla: true, tithiNumber: 1, name: "Shardiya Navratri Ghatasthapana", hindiName: "शारदीय नवरात्रि आरम्भ", icon: "🔱", description: "Commencement of nine nights of Devi Durga worship", colors: "from-rose-500 to-purple-600" },
-  { maas: "आश्विन", isShukla: true, tithiNumber: 10, name: "Vijayadashami (Dussehra)", hindiName: "विजयादशमी (दशहरा)", icon: "🏹", description: "Victory of good over evil", colors: "from-amber-500 to-orange-600" },
-  { maas: "कार्तिक", isShukla: false, tithiNumber: 13, name: "Dhanteras", hindiName: "धनतेरस / धन्वन्तरि जयन्ती", icon: "🏺", description: "Worship of Dhanvantari and Goddess Lakshmi", colors: "from-amber-400 to-yellow-600" },
-  { maas: "कार्तिक", isShukla: false, tithiNumber: 15, name: "Diwali (Deepavali)", hindiName: "दीपावली (लक्ष्मी पूजन)", icon: "🪔", description: "Grand Festival of Lights on Kartik Amavasya", colors: "from-yellow-500 to-orange-600" },
-  { maas: "कार्तिक", isShukla: true, tithiNumber: 11, name: "Devutthana Ekadashi", hindiName: "देवउठनी एकादशी / तुलसी विवाह", icon: "🌿", description: "Lord Vishnu awakens from cosmic slumber", colors: "from-emerald-500 to-teal-700" },
-  { maas: "पौष", isShukla: true, tithiNumber: 1, name: "Makar Sankranti", hindiName: "मकर संक्रान्ति (सूर्य उत्तरायण)", icon: "☀️", description: "Sun enters Makara (Capricorn), beginning Uttarayana", colors: "from-orange-400 to-amber-500" },
-  { maas: "माघ", isShukla: true, tithiNumber: 5, name: "Vasant Panchami", hindiName: "वसन्त पंचमी (सरस्वती पूजा)", icon: "📚", description: "Advent of Spring and worship of Goddess Saraswati", colors: "from-yellow-300 to-amber-500" },
-  { maas: "फाल्गुन", isShukla: false, tithiNumber: 14, name: "Maha Shivaratri", hindiName: "महाशिवरात्रि", icon: "🕉️", description: "The auspicious night of Lord Shiva and Shakti", colors: "from-indigo-600 to-purple-900" },
-  { maas: "फाल्गुन", isShukla: true, tithiNumber: 15, name: "Holi / Holika Dahan", hindiName: "होली (होलिका दहन)", icon: "🎨", description: "Vibrant festival of colours and divine love", colors: "from-pink-500 to-violet-600" }
-];
+export interface StaticFestival {
+  name: string;
+  hindiName: string;
+  icon: string;
+  description: string;
+}
+
+export const STATIC_FESTIVALS: Record<string, StaticFestival> = {
+  // 2026
+  '2026-11-08': {
+    name: 'Diwali (Deepavali)',
+    hindiName: 'दीपावली (लक्ष्मी पूजन)',
+    icon: '🪔',
+    description: 'Grand Festival of Lights on Kartik Amavasya'
+  },
+  '2026-03-03': {
+    name: 'Holi',
+    hindiName: 'होली (रंगोत्सव)',
+    icon: '🎨',
+    description: 'Vibrant festival of colours and divine love'
+  },
+  '2026-03-27': {
+    name: 'Ram Navami',
+    hindiName: 'श्री राम नवमी',
+    icon: '🏹',
+    description: 'Appearance day of Bhagwan Shri Rama'
+  },
+  '2026-09-04': {
+    name: 'Krishna Janmashtami',
+    hindiName: 'श्री कृष्ण जन्माष्टमी',
+    icon: '🦚',
+    description: 'Appearance day of Bhagwan Shri Krishna'
+  },
+  '2026-10-20': {
+    name: 'Vijayadashami (Dussehra)',
+    hindiName: 'विजयादशमी (दशहरा)',
+    icon: '🏹',
+    description: 'Victory of good over evil'
+  },
+  '2026-02-15': {
+    name: 'Maha Shivaratri',
+    hindiName: 'महाशिवरात्रि',
+    icon: '🕉️',
+    description: 'The auspicious night of Lord Shiva and Shakti'
+  },
+  // 2025
+  '2025-10-20': {
+    name: 'Diwali',
+    hindiName: 'दीपावली (लक्ष्मी पूजन)',
+    icon: '🪔',
+    description: 'Grand Festival of Lights on Kartik Amavasya'
+  },
+  '2025-03-14': {
+    name: 'Holi',
+    hindiName: 'होली (होलिका दहन)',
+    icon: '🎨',
+    description: 'Vibrant festival of colours and divine love'
+  },
+  '2025-02-26': {
+    name: 'Maha Shivaratri',
+    hindiName: 'महाशिवरात्रि',
+    icon: '🕉️',
+    description: 'The auspicious night of Lord Shiva and Shakti'
+  },
+  '2025-04-06': {
+    name: 'Ram Navami',
+    hindiName: 'श्री राम नवमी',
+    icon: '🏹',
+    description: 'Appearance day of Bhagwan Shri Rama'
+  },
+  '2025-08-16': {
+    name: 'Krishna Janmashtami',
+    hindiName: 'श्री कृष्ण जन्माष्टमी',
+    icon: '🦚',
+    description: 'Appearance day of Bhagwan Shri Krishna'
+  },
+  // 2024
+  '2024-11-01': {
+    name: 'Diwali',
+    hindiName: 'दीपावली (लक्ष्मी पूजन)',
+    icon: '🪔',
+    description: 'Grand Festival of Lights on Kartik Amavasya'
+  },
+  '2024-03-25': {
+    name: 'Holi',
+    hindiName: 'होली (रंगोत्सव)',
+    icon: '🎨',
+    description: 'Festival of colours'
+  },
+};
 
 export function normalizeAngle(angle: number): number {
   let a = angle % 360;
@@ -270,14 +342,19 @@ export function calculatePanchang(date: Date): PanchangData {
 
   const currentMaas = MAAS_NAMES[maasIndex];
 
-  // Detect active festival
-  let matchedFestival: FestivalInfo | null = null;
-  for (const fest of MAJOR_FESTIVALS) {
-    if (fest.maas === currentMaas.hi && fest.isShukla === isShukla && fest.tithiNumber === tithiNumber) {
-      matchedFestival = fest;
-      break;
-    }
-  }
+  // Match static festival if date matches YYYY-MM-DD
+  const dateKey = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+  const staticFest = STATIC_FESTIVALS[dateKey] || null;
+  const matchedFestival: FestivalInfo | null = staticFest ? {
+    name: staticFest.name,
+    hindiName: staticFest.hindiName,
+    icon: staticFest.icon,
+    description: staticFest.description,
+    maas: currentMaas.hi,
+    isShukla: isShukla,
+    tithiNumber: tithiNumber,
+    colors: "from-amber-500 to-rose-600"
+  } : null;
 
   const angles: CelestialAngles = {
     sunTropical: tropicalSun,
@@ -338,30 +415,33 @@ export function calculatePanchang(date: Date): PanchangData {
 }
 
 /**
- * Accurately finds the orbital day offset to align the 3D celestial canvas
- * and panchang directly with any festival occurrence (past or future).
+ * Calculates the exact next time the Moon-Sun relative angle (Δθ) reaches
+ * a target angle: 180° for Full Moon (Purnima) or 0° for New Moon (Amavasya).
  */
-export function findExactFestivalOffset(festHindiName: string, baseDate: Date): number {
-  const fest = MAJOR_FESTIVALS.find(
-    (f) => f.hindiName.includes(festHindiName) || f.name.toLowerCase().includes(festHindiName.toLowerCase())
-  );
-  if (!fest) return 0;
+export function findNextLunarPhaseOffset(targetAngle: 0 | 180, baseDate: Date, currentOffset: number): number {
+  const currentDate = new Date(baseDate.getTime() + currentOffset * 86400000);
+  const currentPanchang = calculatePanchang(currentDate);
+  const currentRel = currentPanchang.angles.relative;
 
-  let bestOffset = 0;
-  let minDiff = Infinity;
-
-  // Search dynamically within +/- 380 days in fine fractional steps
-  for (let d = -380; d <= 380; d = parseFloat((d + 0.1).toFixed(2))) {
-    const testDate = new Date(baseDate.getTime() + d * 86400000);
-    const p = calculatePanchang(testDate);
-    if (p.activeFestival && p.activeFestival.name === fest.name) {
-      const dist = Math.abs(d);
-      if (dist < minDiff) {
-        minDiff = dist;
-        bestOffset = d;
-      }
-    }
+  // Angular difference to travel forward in the synodic cycle
+  let diff = (targetAngle - currentRel + 360) % 360;
+  // If already at or very close (< 0.2°) to the target, jump to the next lunar cycle
+  if (diff < 0.2) {
+    diff = 360;
   }
 
-  return bestOffset;
+  // Mean synodic motion rate: 360° / 29.53058885 days ≈ 12.190747°/day
+  let daysForward = diff / 12.190747;
+  let candidateOffset = currentOffset + daysForward;
+
+  // Refine candidate offset using Newton-Raphson iterations with exact celestial mechanics
+  for (let i = 0; i < 4; i++) {
+    const testDate = new Date(baseDate.getTime() + candidateOffset * 86400000);
+    const p = calculatePanchang(testDate);
+    // Angular error wrapped into [-180, 180]
+    let error = ((p.angles.relative - targetAngle + 540) % 360) - 180;
+    candidateOffset -= error / 12.190747;
+  }
+
+  return parseFloat(candidateOffset.toFixed(1));
 }
