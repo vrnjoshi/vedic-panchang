@@ -1039,19 +1039,19 @@ export const CelestialCanvas: React.FC<CelestialCanvasProps> = ({ panchang, offs
       />
 
       {/* Floating Visual Key: Explains how Current Nakshatra is determined by the Earth -> Moon sightline */}
-      <div className="pointer-events-none absolute bottom-3 left-1/2 -translate-x-1/2 z-10 w-[95%] max-w-xl text-center px-2">
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/85 backdrop-blur-md border border-white/10 text-xs shadow-xl text-slate-200">
+      <div className="pointer-events-none absolute bottom-3 sm:bottom-4 left-1/2 -translate-x-1/2 z-10 w-[94%] sm:w-auto max-w-lg text-center px-2 mb-[env(safe-area-inset-bottom,0px)]">
+        <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 rounded-full bg-slate-950/90 backdrop-blur-md border border-cyan-500/30 text-[11px] sm:text-xs shadow-xl text-slate-200 text-left sm:text-center">
           <span className="w-2 h-2 rounded-full bg-cyan-400 shrink-0 animate-ping" />
-          <span className="truncate">
+          <span className="leading-snug break-words">
             {language === 'hi' ? (
               <>
-                <strong className="text-cyan-300">चन्द्र दृष्टि रेखा:</strong> पृथ्वी से चन्द्रमा की सीध में देखने पर चन्द्रमा{' '}
-                <strong className="text-amber-300">{panchang.nakshatra.name}</strong> ({panchang.nakshatra.index + 1}वां, 13°20' क्षेत्र) के सम्मुख स्थित है।
+                <strong className="text-cyan-300 font-semibold">दृष्टि रेखा:</strong> पृथ्वी-चन्द्रमा की सीध नक्षत्र{' '}
+                <strong className="text-amber-300">{panchang.nakshatra.name}</strong> ({panchang.nakshatra.index + 1}वां, 13°20' क्षेत्र) के सम्मुख है
               </>
             ) : (
               <>
-                <strong className="text-cyan-300">Lunar Sightline:</strong> Looking from Earth through the Moon aligns with{' '}
-                <strong className="text-amber-300">{panchang.nakshatra.nameEn}</strong> (Nakshatra #{panchang.nakshatra.index + 1}, 13°20' sector).
+                <strong className="text-cyan-300 font-semibold">Lunar Sightline:</strong> Earth→Moon aligns with{' '}
+                <strong className="text-amber-300">{panchang.nakshatra.nameEn}</strong> (#{panchang.nakshatra.index + 1}, 13°20' sector)
               </>
             )}
           </span>

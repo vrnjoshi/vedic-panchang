@@ -76,28 +76,46 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   const currentDateKey = `${panchang.date.getFullYear()}-${pad(panchang.date.getMonth() + 1)}-${pad(panchang.date.getDate())}`;
   const activeFestival = STATIC_FESTIVALS[baseDateKey] || STATIC_FESTIVALS[currentDateKey] || null;
 
-  // Minimized state: single-line compact pill (NO language toggle here)
+  // Minimized state: compact pill showing Tithi, Date, and Time (replaces the old angle degrees)
+  const compactDate = new Intl.DateTimeFormat(language === 'hi' ? 'hi-IN' : 'en-US', {
+    day: 'numeric',
+    month: 'short',
+  }).format(panchang.date);
+
+  const compactTime = new Intl.DateTimeFormat(language === 'hi' ? 'hi-IN' : 'en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    hour12: true,
+  }).format(panchang.date);
+
   if (isMinimized) {
+    const tithiName = language === 'hi' ? panchang.tithi.name : panchang.tithi.nameEn;
     return (
       <div className="pointer-events-auto flex items-center">
         <button
           id="btn-expand-left-panel"
           onClick={onToggleMinimize}
-          className="flex items-center gap-2.5 px-3 py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/95 border border-amber-500/40 text-amber-200 text-xs sm:text-sm font-semibold shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group max-w-[calc(100vw-7rem)]"
+          className="flex items-center gap-1.5 sm:gap-2 px-2.5 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-slate-900/90 hover:bg-slate-800/95 border border-amber-500/40 text-amber-200 text-xs sm:text-sm font-semibold shadow-lg backdrop-blur-md transition-all duration-200 hover:scale-[1.02] active:scale-[0.98] group"
           title={language === 'hi' ? 'पंचांग विस्तार करें' : 'Expand Vedic Panchang'}
         >
           <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shrink-0" />
-          <span className="text-white text-xs font-bold shrink-0">
-            {language === 'hi' ? 'वैदिक पंचांग' : 'Vedic Panchang'}
+          
+          {/* Tithi */}
+          <span className="text-white text-xs font-bold shrink-0 truncate max-w-[110px] sm:max-w-none">
+            {tithiName}
           </span>
-          <span className="text-slate-500 font-normal shrink-0">|</span>
-          <span className="text-slate-200 text-xs font-semibold truncate">
-            {language === 'hi' ? panchang.tithi.name : panchang.tithi.nameEn}
-          </span>
+          
           <span className="text-slate-500 font-normal shrink-0">•</span>
-          <span className="text-amber-300 font-mono text-xs font-bold shrink-0">
-            Δθ: {panchang.angles.relative.toFixed(1)}°
+
+          {/* Date & Time */}
+          <span className="text-slate-200 text-xs font-medium shrink-0">
+            {compactDate}
           </span>
+
+          <span className="text-amber-300/90 text-xs font-mono font-medium shrink-0">
+            {compactTime}
+          </span>
+
           <Maximize2 className="w-3.5 h-3.5 text-amber-300/70 group-hover:text-amber-200 ml-0.5 shrink-0" />
         </button>
       </div>
@@ -107,7 +125,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
   return (
     <aside
       id="left-panel"
-      className="pointer-events-auto w-full sm:w-96 md:w-[420px] landscape:w-[380px] md:landscape:w-[430px] max-w-[calc(100vw-2rem)] landscape:max-w-[48vw] md:landscape:max-w-[430px] flex flex-col rounded-2xl bg-slate-950/90 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/80 max-h-[calc(100dvh-2rem)] sm:max-h-[85vh] md:max-h-[90vh] overflow-hidden transition-all duration-300"
+      className="pointer-events-auto w-full sm:w-96 md:w-[420px] landscape:w-[380px] md:landscape:w-[430px] max-w-[calc(100vw-1rem)] sm:max-w-[420px] flex flex-col rounded-2xl bg-slate-950/95 backdrop-blur-xl border border-white/10 shadow-2xl shadow-black/90 max-h-[calc(100dvh-1.5rem)] sm:max-h-[85vh] md:max-h-[90vh] overflow-hidden transition-all duration-300"
     >
       {/* Header (NO language toggle here) */}
       <div className="p-3 sm:p-3.5 pb-2.5 border-b border-white/10 flex items-center justify-between gap-2 bg-white/5 shrink-0">
@@ -224,13 +242,13 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                   </span>
                 </div>
                 <div className="mt-1">
-                  <span className="text-sm font-bold text-white whitespace-nowrap block truncate">
+                  <span className="text-sm font-bold text-white leading-tight block break-words">
                     {language === 'hi' ? panchang.tithi.name : panchang.tithi.nameEn}
                   </span>
                 </div>
               </div>
               <div className="mt-2 pt-1.5 border-t border-white/5 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-300 truncate">
+                <span className="text-xs font-semibold text-slate-300 break-words">
                   {language === 'hi' ? panchang.paksha : panchang.pakshaEn}
                 </span>
               </div>
@@ -243,13 +261,13 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                   {language === 'hi' ? 'मास' : 'Month'}
                 </span>
                 <div className="mt-1">
-                  <span className="text-sm font-bold text-white whitespace-nowrap block truncate">
+                  <span className="text-sm font-bold text-white leading-tight block break-words">
                     {language === 'hi' ? panchang.maas : panchang.maasEn}
                   </span>
                 </div>
               </div>
               <div className="mt-2 pt-1.5 border-t border-white/5">
-                <span className="text-[11px] font-medium text-slate-400 truncate block">
+                <span className="text-[11px] font-medium text-slate-400 block truncate">
                   {language === 'hi' ? 'पूर्णिमान्त प्रणाली' : 'Purnimanta System'}
                 </span>
               </div>
@@ -263,7 +281,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {language === 'hi' ? 'चन्द्र राशि' : 'Moon Sign'}
               </span>
               <div className="mt-1">
-                <span className="text-sm font-bold text-white block truncate">
+                <span className="text-sm font-bold text-white block break-words leading-tight">
                   {language === 'hi' ? panchang.moonRashi : panchang.moonRashiEn}
                 </span>
               </div>
@@ -274,7 +292,7 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 {language === 'hi' ? 'सूर्य राशि' : 'Sun Sign'}
               </span>
               <div className="mt-1">
-                <span className="text-sm font-bold text-white block truncate">
+                <span className="text-sm font-bold text-white block break-words leading-tight">
                   {language === 'hi' ? panchang.sunRashi : panchang.sunRashiEn}
                 </span>
               </div>
@@ -324,15 +342,15 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 const nextOffset = findNextLunarPhaseOffset(180, baseDate, offsetDays);
                 onOffsetChange(nextOffset);
               }}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 transition-all flex items-center gap-2.5 font-medium shadow-sm active:scale-95 text-left group"
+              className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 transition-all flex items-center gap-2 font-medium shadow-sm active:scale-95 text-left group"
               title={language === 'hi' ? 'अगली पूर्णिमा (Δθ = 180°)' : 'Calculate next Full Moon (Δθ = 180°)'}
             >
-              <span className="text-2xl shrink-0 select-none group-hover:scale-110 transition-transform">🌕</span>
+              <span className="text-xl sm:text-2xl shrink-0 select-none group-hover:scale-110 transition-transform">🌕</span>
               <div className="flex flex-col text-left leading-tight min-w-0">
-                <span className="text-white text-xs font-semibold truncate">
+                <span className="text-white text-xs font-semibold leading-tight">
                   {language === 'hi' ? 'अगली पूर्णिमा' : 'Next Purnima'}
                 </span>
-                <span className="text-slate-400 text-[10px] truncate">
+                <span className="text-slate-400 text-[10px] leading-tight mt-0.5">
                   {language === 'hi' ? 'पूर्ण चन्द्र (180°)' : 'Full Moon (180°)'}
                 </span>
               </div>
@@ -344,15 +362,15 @@ export const LeftPanel: React.FC<LeftPanelProps> = ({
                 const nextOffset = findNextLunarPhaseOffset(0, baseDate, offsetDays);
                 onOffsetChange(nextOffset);
               }}
-              className="p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 transition-all flex items-center gap-2.5 font-medium shadow-sm active:scale-95 text-left group"
+              className="p-2 sm:p-2.5 rounded-xl bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white border border-white/10 transition-all flex items-center gap-2 font-medium shadow-sm active:scale-95 text-left group"
               title={language === 'hi' ? 'अगली अमावस्या (Δθ = 0°)' : 'Calculate next New Moon (Δθ = 0°)'}
             >
-              <span className="text-2xl shrink-0 select-none group-hover:scale-110 transition-transform">🌑</span>
+              <span className="text-xl sm:text-2xl shrink-0 select-none group-hover:scale-110 transition-transform">🌑</span>
               <div className="flex flex-col text-left leading-tight min-w-0">
-                <span className="text-white text-xs font-semibold truncate">
+                <span className="text-white text-xs font-semibold leading-tight">
                   {language === 'hi' ? 'अगली अमावस्या' : 'Next Amavasya'}
                 </span>
-                <span className="text-slate-400 text-[10px] truncate">
+                <span className="text-slate-400 text-[10px] leading-tight mt-0.5">
                   {language === 'hi' ? 'नव चन्द्र (0°)' : 'New Moon (0°)'}
                 </span>
               </div>
